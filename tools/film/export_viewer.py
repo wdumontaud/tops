@@ -174,6 +174,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--port', type=int, default=8811)
     ap.add_argument('--idf', default='demo_street')
+    ap.add_argument('--shown', default='canyon_street_1')
     a = ap.parse_args()
     src = os.path.join(HUB, '_runs', 'xdomf90', 'idf_preview_%d_%s.html' % (a.port, socket.gethostname().lower()))
     with open(src, encoding='utf-8') as fh:
@@ -195,6 +196,8 @@ def main():
         r'<script src="/js/v3dstudio\.js"></script><script src="/js/ux-tip\.js"></script>', lambda m: tail)
     sub(r'\s*<button id="studioBtn".*?</button>', '')
     sub(r'<title>IDF — 3D viewer</title>', '<title>TOPS — 3D view</title>')
+    # the demo project is canyon_street_1 on the page, as in the film (take.ALIAS)
+    sub(r'"idf_name":\s*%s' % re.escape(json.dumps(a.idf)), lambda m: '"idf_name": %s' % json.dumps(a.shown))
     sub(r'(<head><meta charset="utf-8">)', lambda m: m.group(1) + '\n' + HEAD)
     if re.search(r'''["']/(?:vendor|js|css)/''', s):
         sys.exit('export_viewer: a file of the hub is still read: %s' % re.findall(r'["\'](/(?:vendor|js|css)/[^"\']*)', s))

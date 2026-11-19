@@ -38,6 +38,11 @@ def keep():
         if os.path.exists(p):
             shutil.move(p, os.path.join(KEEP, f))
             print('moved', f, '->', KEEP)
+    runs = os.path.join(os.path.dirname(IDF), 'runs', NAME)        # the simulations of the film (step s7_sim)
+    if os.path.exists(runs):
+        shutil.move(runs, os.path.join(KEEP, 'runs_' + NAME))
+        print('moved', runs, '->', KEEP)
+    print('left: the caches of %s in C:/Domus - FMU (if any) and its entry in idf/hub_sizing.json' % NAME)
 
 
 if __name__ == '__main__':

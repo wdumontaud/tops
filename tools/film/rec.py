@@ -54,9 +54,9 @@ def store_js(settings, store=None):
 
 
 class Rec:
-    def __init__(self, url, settings=None, port=9341, width=W, height=H, store=DEMO, gpu=True):
+    def __init__(self, url, settings=None, port=9341, width=W, height=H, store=DEMO, gpu=True, extra_js=''):
         self.b = Browser(url, width=width, height=height, port=port, gpu=gpu, dsf=SCALE,
-                         init_js=store_js(settings or {'theme': 'cream'}, store))
+                         init_js=store_js(settings or {'theme': 'cream'}, store) + extra_js)
         self.port, self.frames, self.rec = port, [], False
         self.x, self.y = width * .62, height * .55
         self.w, self.h = width, height

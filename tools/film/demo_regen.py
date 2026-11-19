@@ -4,7 +4,7 @@ canyon_street_1 with START changed, applied by the Regenerate IDF button of the 
 Step 2 of the film types FINAL back: the scene is then canyon_street_1 again, the project of the optimisation and of
 the simulation that follow.
 
-    python tools/film/demo_regen.py [--port 8811]
+    python tools/film/demo_regen.py [--port 8811] [--final]
 """
 import argparse, json, os, sys, time
 
@@ -23,7 +23,10 @@ SCENE = dict(TARGET, **START)
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--port', type=int, default=8811)
+    ap.add_argument('--final', action='store_true',
+                    help='the scene of the end of step 2 (canyon_street_1, its period): after a take, before export_viewer')
     a = ap.parse_args()
+    scene = TARGET if a.final else SCENE
     idf = os.path.join(IDF, NAME + '.idf')
     t0 = os.path.getmtime(idf)
     r = Rec('http://127.0.0.1:%d/?model=xdomf90' % a.port, gpu=False)
@@ -33,7 +36,7 @@ def main():
              " (c.querySelector('button') || c).click(); })()")
         r.wait("document.getElementById('f_idf') && document.getElementById('f_idf').value === %s" % json.dumps(NAME), 60)
         r.pause(4)
-        r.js('applyFormValues(%s)' % json.dumps(SCENE))
+        r.js('applyFormValues(%s)' % json.dumps(scene))
         r.pause(1)
         print('form', r.js('JSON.stringify(Object.fromEntries(Object.entries(collectParams()).filter(([k]) => %s.includes(k))))'
                            % json.dumps(list(START))))
@@ -49,7 +52,7 @@ def main():
         r.pause(3)
         with open(os.path.join(IDF, '#' + NAME, 'hub_params.json'), encoding='utf-8') as fh:
             v = json.load(fh)['values']
-        bad = {k: v.get(k) for k in SCENE if str(v.get(k)) != str(SCENE[k])}
+        bad = {k: v.get(k) for k in scene if str(v.get(k)) != str(scene[k])}
         print('job done after %.0f s; saved form %s' % (time.time() - t, bad or 'as wanted'))
     finally:
         r.close()

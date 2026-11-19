@@ -68,15 +68,45 @@ COUNTRY = """(() => { const p = [...document.querySelectorAll('#uxMapDlg svg .la
 
 # the optimisation runs of the hub of the film (launch.json "hubfilm"): the run of the film is written there, never in env
 OPT_RUNS = os.path.join(os.path.expanduser('~'), 'Documents', 'test', 'site_opt', 'runs')
-RUN_SHOWN = 'canyon_street_1 ls6x10 LaRochelle flux'          # its row in the panel of the pill (copy of the env run)
+RUN_SHOWN = 'canyon_street_1 ls6x10 LaRochelle flux'          # its row in the panel of the pill (copy of the env run;
+#                                                               the run of the film has the same name in the film: finished)
 # the side panel scrolled by the wheel until an element is in its middle: its centre (None: not shown)
 SIDE_AT = """(() => { const e = document.querySelector(%s); if (!e) return null; const q = e.getBoundingClientRect();
   return [q.left + q.width / 2, q.top + q.height / 2, innerHeight]; })()"""
 RUNNING = "JOBS.some(j => j.status === 'running')"
+# the demo project (a copy of canyon_street_1) carries the name of canyon_street_1 in the film: one project, the one of the
+# optimisation run shown (the page of the film only: its text, never what is sent to the hub)
+DEMO_IDF = 'demo_street'
+# the page of the film shows no folder of this computer (the user's name is in it): they become C:\TOPS, C:\Users\user
+ENV_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..', 'env'))
+HOME_DIR = os.path.normpath(os.path.expanduser('~'))
+ALIAS = {DEMO_IDF: 'canyon_street_1', ENV_DIR: 'C:\\TOPS', ENV_DIR.replace('\\', '/'): 'C:/TOPS',
+         HOME_DIR: 'C:\\Users\\user', HOME_DIR.replace('\\', '/'): 'C:/Users/user'}
+ALIAS_JS = r"""(() => { const A = %s, keys = Object.keys(A).sort((a, b) => b.length - a.length);
+  const re = new RegExp(keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+  const fix = n => { if (n.nodeType === 3) { if (keys.some(k => n.data.indexOf(k) >= 0)) n.data = n.data.replace(re, m => A[m]); return; }
+    if (n.nodeType !== 1 || n.tagName === 'SCRIPT' || n.tagName === 'STYLE') return;
+    const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT); const all = []; let t; while ((t = w.nextNode())) all.push(t); all.forEach(fix); };
+  const start = () => { fix(document.documentElement);
+    new MutationObserver(ms => ms.forEach(m => m.type === 'characterData' ? fix(m.target) : m.addedNodes.forEach(fix)))
+      .observe(document.documentElement, {subtree: true, childList: true, characterData: true}); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); })();
+""" % json.dumps(ALIAS)
+SIM_START, SIM_END = '2001-07-14T00:00', '2001-07-17T00:00'      # the simulation of the best design: three summer days
 STOP = "(() => { const j = JOBS.find(j => j.status === 'running'); if (j) post('/stop', {job: j.key}); return !!j; })()"
 
 # the changes of step 2 (each one seen at once on the urban plan): back to canyon_street_1
 CHANGES = [('#f_' + k, str(FINAL[k])) for k in ('rows_1', 'DX', 'floors_1')]
+
+
+def txq(r, sel, txt):
+    """An element by selector and its exact text: its centre."""
+    xy = r.js("(() => { const e = [...document.querySelectorAll(%s)].find(x => x.textContent.trim() === %s && x.offsetWidth);"
+              " if (!e) return null; const q = e.getBoundingClientRect(); return [q.left + q.width / 2, q.top + q.height / 2]; })()"
+              % (json.dumps(sel), json.dumps(txt)))
+    if not xy:
+        raise RuntimeError('not in the page: %s %s' % (sel, txt))
+    return tuple(xy)
 
 
 def txy(r, sel, txt):
@@ -216,6 +246,11 @@ def step_weather(r):
 def step_optim(r):
     r.x, r.y = r.w * .5, r.h * .5
     r.cursor()
+    # the period of the run shown (a year): its name is the one of the run shown (period chip)
+    r.js("(() => { for (const [k, v] of [['f_t_start', '2001-01-01T00:00'], ['f_t_end', '2002-01-01T00:00']]) {"
+         " const f = document.getElementById(k); f.value = v; f.dispatchEvent(new Event('input', {bubbles: true}));"
+         " f.dispatchEvent(new Event('change', {bubbles: true})); } })()")
+    r.pause(.5)
     r.click('#modeSwitch button:nth-child(2)', dur=1.0, after=2.2)     # Optimisation: the design in the Section
     x, y = side_to(r, '#f_ls_my')
     r.type_in('#f_ls_my', '10', dur=.7, per_char=.14)                    # level-set: 6 x 10 functions
@@ -225,6 +260,10 @@ def step_optim(r):
     pick(r, '#f_opt_method', 'genetic', 1.4)                             # genetic algorithm (NSGA-II)
     side_to(r, '#f_opt_objectives', .4, .66)
     pick(r, '#f_opt_objectives', 'flux', 1.4)                            # the heat flux through the internal face
+    side_to(r, '#f_opt_pop', .45, .7)
+    r.type_in('#f_opt_pop', '200', dur=.8, per_char=.14)                 # 200 individuals, as the run shown
+    r.js('document.activeElement.blur()')
+    r.pause(1.0)
     run = r.js("document.getElementById('f_opt_run').value")
     if not run.startswith('xdomf90/') or r.js("document.getElementById('f_opt_where').value") != 'local':
         raise RuntimeError('the run of the film must be local: %s' % run)
@@ -239,30 +278,94 @@ def step_optim(r):
     r.click((x, y), dur=.2, after=.4)
     r.wait(RUNNING, 20)
     r.glide(r.w * .62, r.h * .80, 1.0)
-    r.pause(4.0)                                                         # the run starts: terminal, pill
-    with r.cut():                                                        # the first evaluations
-        t = time.time()
-        while evals(run) < 6 and time.time() - t < 1500:
-            time.sleep(2)
-        r.pause(2)
-    r.pause(4.0)                                                         # evaluations done, the pill moves
-    with r.cut():                                                        # the run of the film stopped: never shown
-        r.js(STOP)
-        r.wait('!' + RUNNING, 300)
-        r.pause(2)
-    r.click('#uxPill', dur=1.0, after=1.6)                               # the runs: the one done on the cluster
-    xy = r.js("(() => { const t = [...document.querySelectorAll('tr')].find(t => t.textContent.includes(%s) && t.offsetWidth);"
-              " if (!t) return null; const q = t.getBoundingClientRect(); return [q.left + 90, q.top + q.height / 2]; })()"
-              % json.dumps(RUN_SHOWN))
-    if not xy:
-        raise RuntimeError('not in the runs: ' + RUN_SHOWN)
-    r.glide(xy[0] + 140, xy[1] - 40, .7)
-    r.pause(1.0)
-    r.click(tuple(xy), dur=.6, after=.5)
-    r.wait("document.getElementById('f_idf').value === 'canyon_street_1'", 30)
-    r.glide(r.w * .55, r.h * .5, .9)
     r.hide_cursor()
-    r.pause(5.0)                                                         # its best designs, its convergence
+    r.pause(5.0)                                                         # the run starts: terminal, pill, Stop
+    # the time of the run cut: the film goes on with the run of the cluster, finished (same name in the film: ALIAS).
+    # The run of the film is stopped and the run shown opened from the pill, all in the cut (never seen).
+    with r.cut():
+        r.js(STOP)
+        r.pause(3)
+        r.js(STOP)                                                       # again: its Domus runs killed
+        r.wait('!' + RUNNING, 300)
+        r.click('#uxPill', dur=.1, after=1.5)
+        xy = r.js("(() => { const t = [...document.querySelectorAll('tr')].find(t => t.textContent.includes(%s) && /finished/.test(t.textContent) && t.offsetWidth);"
+                  " if (!t) return null; const q = t.getBoundingClientRect(); return [q.left + 90, q.top + q.height / 2]; })()"
+                  % json.dumps(RUN_SHOWN))
+        if not xy:
+            raise RuntimeError('not in the runs: ' + RUN_SHOWN)
+        r.click(tuple(xy), dur=.1, after=.5)
+        r.wait("document.getElementById('f_idf').value === 'canyon_street_1'", 30)
+        if r.js("!!document.getElementById('uxRuns') && !!document.getElementById('uxRuns').offsetWidth"):
+            r.b.key('Escape', 27)
+        r.js("setCollapsed(document.getElementById('pTerm'), true)")      # the terminal of the run of the film
+        r.js(TOP)
+        r.hide_cursor()
+        r.pause(6)                                                       # its figures drawn
+    r.pause(2.0)
+
+
+def step_results(r):
+    r.x, r.y = r.w * .55, r.h * .62
+    r.cursor()
+    r.click(txy(r, '#pGeom .ux-ptabs button', 'Section'), dur=.9, after=.4)   # the best design of each generation
+    r.glide(r.w * .45, r.h * .5, .8)
+    r.pause(6.5)
+    r.click('#pGraphs .ux-fullbtn', dur=1.0, after=2.6)                       # the figures on the whole page
+    r.glide(r.w * .5, r.h * .55, .9)
+    r.pause(3.0)                                                              # Convergence
+    r.click(txq(r, '#pGraphs button', 'Interface'), dur=.9, after=4.2)       # the reference and the best design
+    r.click(txq(r, '#pGraphs button', 'Interfaces'), dur=.9, after=4.6)      # the best of the generations
+    r.b.key('Escape', 27)
+    r.pause(1.2)
+    r.click(txy(r, '#pGraphs button', 'Load #'), dur=1.0, after=.5)          # the best design into the form
+    r.glide(r.w * .6, r.h * .45, .8)
+    r.wait(VIEW_READY, 60)                                                    # the 3D view of the form again
+    r.pause(3.0)
+
+
+def step_sim(r):
+    r.x, r.y = r.w * .5, r.h * .5
+    r.cursor()
+    r.click('#modeSwitch button:nth-child(1)', dur=1.0, after=1.6)          # Simulation: the best design in the form
+    # the simulation runs on the demo project (copy of canyon_street_1, same name in the film), never on canyon_street_1:
+    # the idf changed and the form put back as it was (changing the idf loads the form of its project)
+    with r.cut():
+        r.js("window.__snap = collectParams(); (() => { const f = document.getElementById('f_idf'); f.value = %s;"
+             " f.dispatchEvent(new Event('change', {bubbles: true})); })()" % json.dumps(DEMO_IDF))
+        r.pause(5)
+        for _ in range(6):                          # the form of the project may still be arriving: again until it holds
+            r.js("applyFormValues(Object.assign({}, __snap, {idf: %s})); saveFormValues(); autoPreview();" % json.dumps(DEMO_IDF))
+            r.pause(5)
+            diff = r.js("(() => { const p = collectParams(); return JSON.stringify(Object.keys(__snap).filter(k => k !== 'idf'"
+                        " && JSON.stringify(p[k]) !== JSON.stringify(__snap[k])).map(k => [k, String(__snap[k]).slice(0, 40), String(p[k]).slice(0, 40)])); })()")
+            if diff == '[]':
+                break
+        if diff != '[]' or r.js("document.getElementById('f_idf').value") != DEMO_IDF:
+            raise RuntimeError('the form of the simulation is not the design loaded: %s' % diff)
+        r.js(TOP)
+        r.pause(2)
+    side_to(r, '#f_t_start', .35, .55)
+    pick(r, '#f_t_start', SIM_START, 1.0)                                     # three summer days (date fields: set)
+    pick(r, '#f_t_end', SIM_END, 1.2)
+    side_to(r, '#f_model_output', .4, .66)
+    pick(r, '#f_model_output', 'temperature and fluxes field', 1.4)         # the fields in the wall, kept
+    if r.js("document.getElementById('f_t_end').value") != SIM_END:
+        raise RuntimeError('the period of the simulation is not set')
+    x, y = r.center('#runBtn')
+    r.glide(x - 50, y + 40, .8)
+    r.glide(x, y, .4)
+    r.pause(2.2)                                                              # its tooltip: the time it takes
+    r.click((x, y), dur=.2, after=.4)
+    r.wait(RUNNING, 20)
+    r.glide(r.w * .62, r.h * .80, 1.0)
+    r.hide_cursor()
+    r.pause(5.0)                                                              # Domus and the wall model: the terminal
+    with r.cut():                                                             # the time of the simulation
+        r.wait('!' + RUNNING, 3600)
+        r.js("setCollapsed(document.getElementById('pTerm'), true)")          # its results, not the terminal
+        r.js(TOP)
+        r.pause(8)
+    r.pause(4.5)                                                              # done: its results
 
 
 def main():
@@ -270,7 +373,7 @@ def main():
     ap.add_argument('--port', type=int, default=8811)
     a = ap.parse_args()
     hub = 'http://127.0.0.1:%d' % a.port
-    r = Rec(hub + '/splash.html?mode=hold')
+    r = Rec(hub + '/splash.html?mode=hold', extra_js=ALIAS_JS)
     try:
         r.wait("document.readyState === 'complete'")
         r.pause(.6)
@@ -295,6 +398,10 @@ def main():
         step_weather(r)
         r.mark('s5_optim')
         step_optim(r)
+        r.mark('s6_results')
+        step_results(r)
+        r.mark('s7_sim')
+        step_sim(r)
         r.stop(MEDIA, first='s1_open')
         film = {'frame': [r.w, r.h], 'clips': {n: round(d, 3) for n, d in r.durations}, 'live': live}
         with open(os.path.join(MEDIA, 'film.json'), 'w', encoding='utf-8') as fh:

@@ -29,9 +29,14 @@ rend la main au défilement (retour en douceur), comme la fin de l'étape.
   accueil → co-simulation sur la démo), `s2_scene` (plan Urban plan, rangées / DX / étages, bouton à côté de Run,
   nouvelle scène ; l'attente du dimensionnement Domus est coupée), `s4_weather` (fenêtre Weather : carte des
   stations, La Rochelle, climat futur, nouvelle période 2050, climat actuel gardé), `s5_optim` (mode Optimisation,
-  level-set 6 × 10, génétique, objectif flux, estimation de Run, Run d'un **run fictif** — runs génétiques du hub de
-  film dans `Documents\test\site_opt\runs` —, attente coupée, run arrêté hors film, puis ouverture par la pastille du
-  run `canyon_street_1 ls6x10 LaRochelle flux` fait au cluster, copié dans ce dossier). La démo part de canyon_street_1
+  level-set 6 × 10, génétique, objectif flux, 200 individus, période d'un an, estimation de Run, Run d'un **run fictif**
+  — runs génétiques du hub de film dans `Documents\test\site_opt\runs` —, puis, dans la coupe, run fictif arrêté et run
+  `canyon_street_1 ls6x10 LaRochelle flux` fait au cluster (copié dans ce dossier) ouvert : même nom dans le film, on
+  ne voit ni l'arrêt ni la liste), `s6_results` (onglet Section = meilleur dessin de chaque génération, figures en
+  plein écran : Convergence, Interface, Interfaces ; Load #4198 into the form), `s7_sim` (mode Simulation, 14-17 juillet,
+  sorties « temperature and fluxes field », Run : vraie co-simulation de ~30 s sur la démo, terminal replié à la fin).
+  **Dans la page filmée** (`ALIAS` de take.py, texte seulement, jamais ce qui part au hub) : `demo_street` s'affiche
+  `canyon_street_1`, le dossier env `C:\TOPS`, les dossiers de l'utilisateur `C:\Users\user`. La démo part de canyon_street_1
   modifié (une rangée derrière, DX 7, 3 étages) et l'étape 2 la ramène à canyon_street_1, le projet de l'optimisation
   et de la simulation qui suivent. La fin de la clé Copernicus de la fenêtre Weather est cachée pendant la prise.
 - `viewer/` : la visionneuse de la scène (`tools/film/export_viewer.py`, depuis celle du hub de test : sans Studio,
@@ -55,12 +60,13 @@ rend la main au défilement (retour en douceur), comme la fin de l'étape.
    `NSGA2_RUNS` = `Documents\test\site_opt\runs`, qui doit contenir la copie du run flux et pas le run fictif).
 2. `python tools/film/demo_regen.py` (la démo revient à son état de départ ; la prise la modifie).
 3. Relancer le hub de test (terminal vide), puis `python tools/film/take.py`.
-4. `python tools/film/probe.py <image>` (la vue 3D du hub revient sur demo_street : la prise finit sur
-   canyon_street_1), puis `python tools/film/export_viewer.py` (visionneuse de la scène, avec ses facteurs de forme).
+4. La vue 3D du hub revient sur demo_street (la prise finit sur canyon_street_1) : **`python tools/film/demo_regen.py --final`** (scène et période de la fin de s2, par Regenerate :
+   la vue 3D du hub est rendue autrement après Regenerate ; la page fond l'image et la vue en 0,8 s aux deux bouts), puis
+   `python tools/film/export_viewer.py` (visionneuse de la scène, avec ses facteurs de forme, nom canyon_street_1).
    Run fictif et son `C:\Domus - FMU\temp_opti\nsga_flux_<jeton>` à la corbeille.
 5. Vérifier `media/` (premières et dernières images, `TOPS_FILM_DUMP`) avant de publier : aucune donnée personnelle.
 
 ## Pas encore fait
-- Étapes suivantes : résultats de l'optimisation, courte simulation avec champs, champs.
+- Étape suivante : les champs dans la paroi (onglets Temperature field, flux de la simulation de s7).
 - Netteté sur écrans fins : double densité = 12 images/s seulement (`SCALE` de rec.py), non retenue.
 - Service du téléchargement par code (codes, 5 dernières versions, e-mail aux détenteurs d'un code).

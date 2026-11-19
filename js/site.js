@@ -26,8 +26,12 @@
       s4t: 'Choisir la météo',
       s4p: 'Une fenêtre pour les stations météo du monde entier (17 000). Pour La Rochelle : le climat actuel, ou des climats futurs (RCP 8.5) tirés des projections de Copernicus, sur la période de son choix. On garde ici le climat actuel.',
       s5t: 'Optimiser la forme de la paroi',
-      s5p: 'En mode Optimisation, la paroi devient un dessin libre de deux matériaux (level-set). Un algorithme génétique cherche celui qui réduit le flux de chaleur à travers la face intérieure ; chaque essai est une co-simulation Domus. Run donne d’abord une estimation du temps. Le run complet a tourné sur le cluster : 4 200 co-simulations sur un an.',
-      s6t: 'Les résultats de l’optimisation', soon: 'Bientôt.', steps: 'Étapes'
+      s5p: 'En mode Optimisation, la paroi devient un dessin libre de deux matériaux (level-set). Un algorithme génétique cherche celui qui réduit le flux de chaleur à travers la face intérieure sur un an ; chaque essai est une co-simulation Domus. Run donne d’abord une estimation du temps ; le run complet (200 individus, 20 générations, 4 200 co-simulations) a tourné sur le cluster.',
+      s6t: 'Les résultats de l’optimisation',
+      s6p: 'Le meilleur dessin de chaque génération défile dans la coupe de la paroi. La convergence : de 700 kWh pour le mur plan à 180 kWh, soit −74 %. Puis le dessin optimal face à la référence, et les meilleurs au fil des générations. Un clic le charge dans le formulaire.',
+      s7t: 'Simuler le cas optimal',
+      s7p: 'Le dessin optimal, en mode Simulation : trois jours de juillet, avec les champs de température et de flux dans la paroi. Domus (le bâtiment et la rue) et le modèle de paroi tournent ensemble, pas à pas.',
+      s8t: 'Les champs dans la paroi', soon: 'Bientôt.', steps: 'Étapes'
     },
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
@@ -50,8 +54,12 @@
       s4t: 'Choosing the weather',
       s4p: 'One window for the weather stations of the whole world (17,000). For La Rochelle: the present climate, or future climates (RCP 8.5) made from the Copernicus projections, over the period of your choice. Here the present climate is kept.',
       s5t: 'Optimising the shape of the wall',
-      s5p: 'In Optimisation mode the wall becomes a free drawing of two materials (level-set). A genetic algorithm looks for the one that lowers the heat flux through the internal face; each try is a Domus co-simulation. Run first gives an estimate of the time. The full run was done on the cluster: 4,200 co-simulations over a year.',
-      s6t: 'The results of the optimisation', soon: 'Coming soon.', steps: 'Steps'
+      s5p: 'In Optimisation mode the wall becomes a free drawing of two materials (level-set). A genetic algorithm looks for the one that lowers the heat flux through the internal face over a year; each try is a Domus co-simulation. Run first gives an estimate of the time; the full run (200 individuals, 20 generations, 4,200 co-simulations) was done on the cluster.',
+      s6t: 'The results of the optimisation',
+      s6p: 'The best drawing of each generation plays in the section of the wall. The convergence: from 700 kWh for the plane wall to 180 kWh, −74 %. Then the optimal drawing against the reference, and the best ones generation after generation. One click loads it into the form.',
+      s7t: 'Simulating the optimal case',
+      s7p: 'The optimal drawing in Simulation mode: three days of July, with the fields of temperature and heat flux in the wall. Domus (the building and the street) and the wall model run together, step by step.',
+      s8t: 'The fields in the wall', soon: 'Coming soon.', steps: 'Steps'
     }
   };
   var store = {
@@ -165,6 +173,7 @@
     var live = screen.querySelector('.live'), frame = live.querySelector('iframe'), gate = live.querySelector('.gate');
     var tour = screen.querySelector('.tour'), resume = tour.querySelector('.resume');
     var W = null, free = false, lastU = null, blend = null, liveOn = false;
+    var FADE = 0.8;              // seconds of film of the cross-fade picture <-> live view (each end)
     var EXP = 1.6;               // seconds of film to grow from the picture to the whole screen (and back at the end)
     var liveLoad = function (s) {
       if (frame.dataset.src) return;
@@ -261,6 +270,9 @@
       // the picture under it: the last one of the step before (= the first of the next)
       var p = u < EXP ? ease(u / EXP) : u > s.dur - EXP ? ease((s.dur - u) / EXP) : 1;
       placeLive(p);
+      // a cross-fade with the picture at both ends: the hub draws its 3D view a bit differently after Regenerate
+      var o = Math.max(0, Math.min(1, u / FADE, (s.dur - u) / FADE)).toFixed(3);
+      if (live.style.opacity !== o) live.style.opacity = o;
       if (!liveOn) { liveOn = true; screen.classList.add('live-on'); W.resize(); }
       var full = p > .98;
       if (full !== screen.classList.contains('touring')) { screen.classList.toggle('touring', full); W.hud(full); }

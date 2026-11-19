@@ -1,0 +1,5 @@
+# never on the site: TOPS packages (sent by a personal link) and raw recordings
+*.zip
+raw/
+__pycache__/
+desktop.ini

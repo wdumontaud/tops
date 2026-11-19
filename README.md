@@ -1,32 +1,23 @@
-# Prototype du site TOPS : chapitre « la scène »
+# Site de TOPS
 
-Page qui défile : la vraie géométrie de `canyon_street_1` en 3D (three.js), pilotée par le défilement.
-
-| Étape | Ce qui se passe |
-|---|---|
-| Titre | la rue tourne doucement, fin d'après-midi |
-| 01 | les contours des faces de l'idf s'allument (303 faces, 35 zones) |
-| 02 | la zone étudiée ressort, le reste s'assombrit |
-| 03 | 4 niveaux → rue de 10 m → sans toits en pente → retour au projet (vraies variantes) |
-| 04 | une journée du 21 juin à La Rochelle, ombres en temps réel |
-| 05 | la caméra descend dans la rue devant la façade étudiée |
+Page d'accueil (téléchargement par code, version 2026.11, Windows / Linux) puis des chapitres : chacun montre un
+extrait filmé de la vraie application, lancé quand il arrive à l'écran, avec « Continuer ↓ » à la fin.
+Thème crème de TOPS, français / anglais (bouton FR | EN, choix gardé dans le navigateur).
 
 ## Fichiers
-- `index.html`, `css/site.css`, `js/story.js` : la page.
-- `vendor/three.min.js` : three.js r128 (licence MIT, copie de celle du hub).
-- `data/scene.json` / `data/scene.js` : géométrie des 4 variantes (même contenu ; le `.js` permet d'ouvrir la page
-  sans serveur).
-- `tools/make_scene.py` : refait `data/` avec le code du hub (`py2idf.urbanGeometry` dans un dossier temporaire ;
-  les idf d'env ne sont pas touchés). Variantes : liste `VARIANTS`.
+- `index.html`, `css/site.css`, `js/site.js` (textes FR / EN dans `T`).
+- `assets/tops.png` : icône de TOPS.
+- `media/chN_*.mp4` + `.jpg` (dernière image) + `_first.jpg` (première image, affichée avant la lecture).
+- `tools/film/rec.py` : tournage (Edge sans fenêtre sur un hub de test 8811, screencast, 30 images/s, encodage par
+  `core/videoenc.py` du hub). `tools/film/chN_*.py` : un scénario par chapitre.
 - `tools/serve.py` : aperçu local.
 
-## Commandes
-```
-python tools/serve.py            # http://127.0.0.1:8840/
-python tools/make_scene.py       # après un changement de canyon_street_1 ou des variantes
-```
+## Refaire un extrait
+1. Hub de test : configuration `hubtest` de `env/hubgui/.claude/launch.json` (port 8811, jamais le hub 8800).
+2. `python tools/film/ch1_open.py`
+3. Vérifier `media/` (première et dernière image) avant de publier.
 
-## Suite prévue
-- Chapitres 06+ : formulaire et lancement (extraits vidéo en boucle), résultats d'optimisation (Plotly animé),
-  champs du cas optimisé (carte de température pilotée par le défilement).
-- La vidéo de 2-3 min = enregistrement de cette page avec un défilement automatique.
+## Pas encore fait
+- Chapitres 2+ : paramétrage (projet de démonstration copié de canyon_street_1, gardé ensuite dans le bac à sable),
+  vue 3D interactive à la fin, météo, optimisation, résultats, champs.
+- Service du téléchargement par code (codes, 5 dernières versions, e-mail aux détenteurs d'un code).

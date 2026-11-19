@@ -3,75 +3,77 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TOPS — prototype</title>
-<meta name="description" content="TOPS : de la rue à la paroi optimisée. Prototype du chapitre « la scène ».">
+<title>TOPS</title>
+<meta name="description" content="TOPS : optimisation énergétique de la topologie et de la forme d'une paroi de bâtiment.">
+<link rel="icon" href="assets/tops.png">
 <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-<canvas id="scene" aria-label="Vue 3D de la rue canyon_street_1"></canvas>
-<div id="shade"></div>
 
-<div id="hud" aria-hidden="true">
-  <div id="chip"></div>
-  <div id="clock"><span id="clockH"></span><span id="clockD">21 juin · La Rochelle</span></div>
-</div>
-
-<nav id="dots" aria-label="Étapes"></nav>
+<header class="top">
+  <a class="brand" href="#"><img src="assets/tops.png" alt="" width="22" height="22"><span>TOPS</span></a>
+  <div class="lang" role="group" aria-label="Langue / Language">
+    <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
+  </div>
+</header>
 
 <main>
-  <section class="step hero" data-step="hero">
-    <p class="kicker">Thèse · La Rochelle Université</p>
-    <h1>TOPS</h1>
-    <p class="lead">De la rue à la paroi optimisée&nbsp;: une co-simulation du bâtiment et de sa paroi, puis l’optimisation de la forme de cette paroi.</p>
-    <p class="scroll-hint">Faire défiler <span>↓</span></p>
+  <!-- ============ landing: what it is + download ============ -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>TOPS</h1>
+      <p class="sub" data-i18n="tagline">Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment</p>
+      <p class="lead" data-i18n="lead">Une application qui couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis cherche la forme de paroi qui consomme le moins.</p>
+
+      <div class="dl card">
+        <div class="dl-head">
+          <div><b data-i18n="dlTitle">Télécharger TOPS</b><span class="ver">2026.11</span></div>
+          <div class="os"><span class="chip">Windows</span><span class="chip">Linux</span></div>
+        </div>
+        <form class="dl-form" id="dlForm" autocomplete="off">
+          <label for="dlCode" data-i18n="dlLabel">Code d’accès</label>
+          <div class="dl-row">
+            <input id="dlCode" name="code" type="text" inputmode="text" spellcheck="false" data-i18n-ph="dlPh" placeholder="Votre code">
+            <button class="btn accent" type="submit" data-i18n="dlBtn">Télécharger</button>
+          </div>
+          <p class="dl-note" id="dlNote" data-i18n="dlNote">Le code vous est donné personnellement. Vous serez prévenu des nouvelles versions.</p>
+        </form>
+      </div>
+    </div>
+    <figure class="hero-shot win">
+      <div class="win-bar"><i></i><i></i><i></i></div>
+      <img src="media/ch1_open.jpg" alt="" data-i18n-alt="heroAlt">
+    </figure>
+    <a class="more" href="#ch1"><span data-i18n="more">Découvrir l’application</span> <b>↓</b></a>
   </section>
 
-  <section class="step" data-step="build">
-    <div class="card">
+  <!-- ============ chapters: a clip of the real application each ============ -->
+  <section class="chapter" id="ch1" data-clip="media/ch1_open.mp4">
+    <div class="ch-text">
       <p class="num">01</p>
-      <h2>Une rue construite par TOPS</h2>
-      <p>La scène n’est pas dessinée à la main&nbsp;: TOPS l’écrit dans le fichier d’entrée de Domus (idf) à partir de quelques paramètres. Ici, <b>canyon_street_1</b>&nbsp;: une cour ouverte, des toits en pente, une rangée en face.</p>
+      <h2 data-i18n="c1t">Ouvrir TOPS</h2>
+      <p data-i18n="c1p">TOPS s’ouvre comme une application de bureau. L’accueil présente les modèles : on choisit la co-simulation Domus, le bâtiment et sa paroi calculés ensemble.</p>
+    </div>
+    <div class="stage">
+      <div class="win">
+        <video muted playsinline preload="auto" poster="media/ch1_open_first.jpg"></video>
+        <button class="replay" type="button" data-i18n-title="replay" title="Revoir">↻</button>
+      </div>
+      <a class="next" href="#ch2"><span data-i18n="next">Continuer</span> <b>↓</b></a>
     </div>
   </section>
 
-  <section class="step" data-step="zone">
-    <div class="card">
+  <section class="chapter soon" id="ch2">
+    <div class="ch-text">
       <p class="num">02</p>
-      <h2>Un appartement étudié</h2>
-      <p>Au rez-de-chaussée, <span class="hl">la zone étudiée</span>. Sa façade sur rue est la paroi que TOPS calcule finement, en deux dimensions, pendant que Domus simule le reste du bâtiment.</p>
-    </div>
-  </section>
-
-  <section class="step tall" data-step="variants">
-    <div class="card">
-      <p class="num">03</p>
-      <h2>Un paramètre, une autre rue</h2>
-      <p>Chaque réglage du formulaire réécrit l’idf. Le bâtiment étudié prend deux étages, la rue s’élargit, les toits deviennent plats&nbsp;: la scène suit.</p>
-      <ol class="vlist" id="vlist"></ol>
-    </div>
-  </section>
-
-  <section class="step tall" data-step="sun">
-    <div class="card">
-      <p class="num">04</p>
-      <h2>Le soleil, heure par heure</h2>
-      <p>La position du soleil vient de la latitude et de la météo du site. Les ombres des voisins sur la façade étudiée sont calculées sur la vraie géométrie de la scène.</p>
-    </div>
-  </section>
-
-  <section class="step" data-step="facade">
-    <div class="card">
-      <p class="num">05</p>
-      <h2>Et maintenant, la paroi</h2>
-      <p>Derrière cette façade, l’interface entre béton et isolant n’est plus plane&nbsp;: sa forme est le sujet de l’optimisation.</p>
-      <p class="next">Chapitre suivant&nbsp;: l’optimisation →</p>
+      <h2 data-i18n="c2t">Paramétrer la scène</h2>
+      <p data-i18n="soon">Bientôt.</p>
     </div>
   </section>
 </main>
 
-<noscript><p class="nojs">La vue 3D demande JavaScript.</p></noscript>
-<script src="vendor/three.min.js"></script>
-<script src="data/scene.js"></script>
-<script src="js/story.js"></script>
+<footer class="foot"><span>TOPS · La Rochelle Université</span></footer>
+
+<script src="js/site.js"></script>
 </body>
 </html>

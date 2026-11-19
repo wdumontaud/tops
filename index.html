@@ -52,21 +52,29 @@
     <div class="screen">
       <video class="v on" muted playsinline preload="auto" poster="media/s1_open_first.jpg"></video>
       <video class="v" muted playsinline preload="auto"></video>
+      <!-- the end of a step with data-live: the application itself in place of the film (the 3D viewer) -->
+      <div class="live">
+        <iframe title="TOPS 3D" allow="fullscreen" tabindex="-1"></iframe>
+        <button class="gate" type="button"><span data-i18n="liveGo">Cliquez pour vous promener dans la vue 3D</span></button>
+        <button class="leave" type="button" data-i18n="liveOut">Terminer la promenade</button>
+      </div>
       <div class="cap"><p class="num"></p><h2></h2><p class="txt"></p></div>
       <nav class="dots" aria-label="Étapes"></nav>
       <button class="replay" type="button" data-i18n-title="replay" title="Revoir">↻</button>
       <a class="next" href="#film"><span data-i18n="next">Continuer</span> <b>↓</b></a>
     </div>
-    <!-- one step per screen of scrolling; data-clip: media/<name>.mp4 (+ .jpg = its last picture) -->
+    <!-- one step per screen of scrolling; data-clip: media/<name>.mp4 (+ .jpg = its last picture);
+         data-live: page shown at the end of the step (data-time: the time of the viewer at the end of the film) -->
     <div class="steps">
       <div class="step" data-clip="media/s1_open" data-t="s1t" data-p="s1p"></div>
       <div class="step" data-clip="media/s2_scene" data-t="s2t" data-p="s2p"></div>
+      <div class="step" data-clip="media/s3_view" data-t="s3t" data-p="s3p" data-live="viewer/index.html" data-time="media/s3_view.json"></div>
     </div>
   </section>
 
   <section class="soon">
-    <p class="num">03</p>
-    <h2 data-i18n="s3t">Se promener dans la vue 3D</h2>
+    <p class="num">04</p>
+    <h2 data-i18n="s4t">Choisir la météo</h2>
     <p data-i18n="soon">Bientôt.</p>
   </section>
 </main>

@@ -14,7 +14,9 @@ STATE = """JSON.stringify((() => { const s = document.querySelector('.screen'), 
   return {y: Math.round(scrollY), cls: s.className, cap: s.querySelector('.cap h2').textContent,
     v: v.map(e => ({k: e.dataset.k, on: e.classList.contains('on'), t: +e.currentTime.toFixed(2),
                     d: +(e.duration || 0).toFixed(2), paused: e.paused, rs: e.readyState})),
-    top: document.querySelector('.top').className, sw: document.documentElement.scrollWidth, w: innerWidth}; })())"""
+    top: document.querySelector('.top').className, sw: document.documentElement.scrollWidth, w: innerWidth,
+    screen: Math.round(s.getBoundingClientRect().left), live: s.querySelector('.live').className,
+    liveBox: [...['left', 'top', 'width', 'height']].map(k => s.querySelector('.live').style[k])}; })())"""
 
 
 def main():
@@ -39,16 +41,33 @@ def main():
         time.sleep(2)
         shot('landing')
         top = b.js("document.getElementById('film').offsetTop")
-        for y, tag, wait in [(top * .5, 'between', 1), (top, 's1_start', 3), (top, 's1_end', 15),
-                             (top + a.h, 's2_start', 4), (top + a.h, 's2_end', 26), (top, 'back_s1', 2),
-                             (top + 2.2 * a.h, 'after', 2)]:
-            # by steps, like a wheel (the page reacts to the scroll events)
+        n_steps = b.js("document.querySelectorAll('.step').length")
+
+        def scroll(y):          # by steps, like a wheel (the page reacts to the scroll events)
             y0 = b.js('scrollY')
             for i in range(1, 9):
                 b.js('scrollTo(0, %d)' % (y0 + (y - y0) * i / 8))
                 time.sleep(.04)
-            time.sleep(wait)
-            shot(tag)
+
+        scroll(top * .5); time.sleep(1); shot('between')
+        for k in range(n_steps):
+            scroll(top + k * a.h); time.sleep(3); shot('s%d_start' % (k + 1))
+            t = time.time()
+            while not b.js("document.querySelector('.screen').classList.contains('ended')") and time.time() - t < 120:
+                time.sleep(.5)
+            time.sleep(1.5); shot('s%d_end' % (k + 1))
+            if b.js("!!document.querySelectorAll('.step')[%d].dataset.live" % k):
+                t = time.time()
+                while not b.js("document.querySelector('.screen').classList.contains('live-on')") and time.time() - t < 30:
+                    time.sleep(.5)
+                time.sleep(1); shot('s%d_live' % (k + 1))
+                c = b.js("(() => { const r = document.querySelector('.live .gate').getBoundingClientRect();"
+                         " return [r.left + r.width / 2, r.top + r.height / 2]; })()")
+                b.click(*c); time.sleep(1); shot('s%d_walk' % (k + 1))
+                print('viewer time', b.js("document.querySelector('.live iframe').contentWindow.eval('[dayIdx, hour]')"))
+        scroll(top); time.sleep(2); shot('back_s1')
+        scroll(top + (n_steps - .8) * a.h); time.sleep(3); shot('back_last')
+        scroll(top + (n_steps + .2) * a.h); time.sleep(2); shot('after')
         print('errors', b.js("JSON.stringify(window.__errs || [])"))
     finally:
         b.close()

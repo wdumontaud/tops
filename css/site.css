@@ -74,6 +74,25 @@ img, video { display: block; max-width: 100%; }
 .screen { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--bg); }
 .screen .v { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; }
 .screen .v.on { opacity: 1; }
+/* the application itself at the end of a step (over the picture of the film: same box, js/site.js liveFit) */
+.live { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; visibility: hidden;
+  transition: opacity .6s, visibility 0s .6s; }
+.screen.live-on .live { opacity: 1; visibility: visible; transition: opacity .6s; }
+.live iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
+/* until the visitor asks for it, the viewer does not take the wheel: the page goes on scrolling */
+.live .gate { position: absolute; inset: 0; border: 0; padding: 0; background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; }
+.live .gate span { font: 600 15px var(--sans); color: #fffdf7; background: rgba(36,30,22,.62); padding: 12px 22px;
+  border-radius: 999px; box-shadow: 0 8px 30px rgba(40,25,10,.3); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  transition: background .2s; }
+.live .gate:hover span { background: var(--accent); }
+.live.active .gate { display: none; }
+.live .leave { display: none; position: absolute; top: 14px; left: 50%; transform: translateX(-50%); font: 600 13px var(--sans);
+  color: var(--text); background: rgba(248,244,234,.94); border: 1px solid var(--line-2); border-radius: 999px; padding: 7px 16px;
+  cursor: pointer; box-shadow: 0 4px 18px rgba(80,60,30,.18); }
+.live.active .leave { display: block; }
+/* while walking: the buttons of the page above the time bar of the viewer */
+.screen.walking .next, .screen.walking .replay { bottom: 74px; }
 .steps { margin-top: -100vh; margin-top: -100svh; position: relative; pointer-events: none; }
 .step { height: 100vh; height: 100svh; }
 
@@ -100,7 +119,7 @@ img, video { display: block; max-width: 100%; }
   background: var(--accent); color: #fffdf7; text-decoration: none; font-weight: 600; font-size: 14px;
   box-shadow: 0 6px 24px rgba(120,60,20,.28); opacity: 0; transition: opacity .5s, transform .5s; pointer-events: none; }
 .next:hover { background: var(--accent-hover); }
-.screen.ended.more .next { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.screen.ended.onward .next { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
 
 .soon { max-width: 760px; margin: 0 auto; padding: 14vh max(16px, 4vw); text-align: center; }
 .soon .num { font: 700 12px var(--mono); letter-spacing: .14em; color: var(--accent); margin: 0 0 8px; }

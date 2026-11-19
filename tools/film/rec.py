@@ -25,6 +25,8 @@ from cdp import Browser, OVERLAY_JS, OWN_STORE      # noqa: E402
 
 W, H = 1440, 900
 FPS = 30
+BITRATE = 5_000_000      # bits/s of the clips (a page on the web: ~0.13 bit per pixel and frame)
+SHOT_Q = 72              # JPEG of the screencast: 92 gives 12 pictures/s on a full screen 3D view, 72 about 24
 DUMP = os.environ.get('TOPS_FILM_DUMP')        # folder: one picture every 2 s of film, to check a take
 
 # what the film opens: the demo project (tools/film/demo_project.py) in the realistic 3D view, with its neighbourhood
@@ -48,6 +50,7 @@ class Rec:
                          init_js=store_js(settings or {'theme': 'cream'}, store))
         self.port, self.frames, self.rec = port, [], False
         self.x, self.y = width * .62, height * .55
+        self.w, self.h = width, height
         self._lock = threading.Lock()
         # times: seconds since the epoch, the clock of the frames (metadata.timestamp = when the page drew them;
         # they arrive late when the page is busy: never the time of arrival)
@@ -64,7 +67,7 @@ class Rec:
         self.ws2 = websocket.create_connection(page['webSocketDebuggerUrl'], max_size=None, suppress_origin=True)
         self.frames, self.rec, self.t0 = [], True, time.time()
         self.ws2.send(json.dumps({'id': 1, 'method': 'Page.startScreencast',
-                                  'params': {'format': 'jpeg', 'quality': 92, 'everyNthFrame': 1}}))
+                                  'params': {'format': 'jpeg', 'quality': SHOT_Q, 'everyNthFrame': 1}}))
         self.th = threading.Thread(target=self._pump, daemon=True)
         self.th.start()
         self.cursor()
@@ -169,7 +172,7 @@ class Rec:
                     last = j
                 for attempt in (1, 2, 3):          # the encoder page fails now and then ("Failed to fetch")
                     try:
-                        res = encode(paths, os.path.join(media, name + '.mp4'), FPS, repeat=reps)
+                        res = encode(paths, os.path.join(media, name + '.mp4'), FPS, repeat=reps, bitrate=BITRATE)
                         break
                     except RuntimeError as e:
                         print('encoding %s, attempt %d: %s' % (name, attempt, e))

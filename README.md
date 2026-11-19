@@ -28,7 +28,10 @@ rend la main au défilement (retour en douceur), comme la fin de l'étape.
   la vue 3D dans l'image, sa caméra et son heure à la fin de l'étape 2. Étapes filmées : `s1_open` (ouverture →
   accueil → co-simulation sur la démo), `s2_scene` (plan Urban plan, rangées / DX / étages, bouton à côté de Run,
   nouvelle scène ; l'attente du dimensionnement Domus est coupée), `s4_weather` (fenêtre Weather : carte des
-  stations, La Rochelle, climat futur, nouvelle période 2050, climat actuel gardé). La démo part de canyon_street_1
+  stations, La Rochelle, climat futur, nouvelle période 2050, climat actuel gardé), `s5_optim` (mode Optimisation,
+  level-set 6 × 10, génétique, objectif flux, estimation de Run, Run d'un **run fictif** — runs génétiques du hub de
+  film dans `Documents\test\site_opt\runs` —, attente coupée, run arrêté hors film, puis ouverture par la pastille du
+  run `canyon_street_1 ls6x10 LaRochelle flux` fait au cluster, copié dans ce dossier). La démo part de canyon_street_1
   modifié (une rangée derrière, DX 7, 3 étages) et l'étape 2 la ramène à canyon_street_1, le projet de l'optimisation
   et de la simulation qui suivent. La fin de la clé Copernicus de la fenêtre Weather est cachée pendant la prise.
 - `viewer/` : la visionneuse de la scène (`tools/film/export_viewer.py`, depuis celle du hub de test : sans Studio,
@@ -37,7 +40,7 @@ rend la main au défilement (retour en douceur), comme la fin de l'étape.
   `window.__site` = ce que la page conduit).
 - `tools/film/take.py` : la prise (étapes filmées à la suite). `tools/film/rec.py` : tournage (Edge sans fenêtre sur
   un hub de test 8811, carte graphique pour la 3D, screencast daté par l'heure de rendu, coupes `cut()`, repères
-  `mark()`, 30 images/s, 6 Mbit/s, encodage par `core/videoenc.py` du hub avec `gop`). Stockage propre à la page :
+  `mark()`, 30 images/s, JPEG 85, 10 Mbit/s, curseur animé dans la page (`GLIDE_JS`), encodage par `core/videoenc.py` du hub avec `gop`). Stockage propre à la page :
   thème crème, projet `demo_street`, vue 3D réaliste avec le quartier (`DEMO`). `TOPS_FILM_DUMP=<dossier>` : une
   image toutes les 2 s.
 - `tools/film/demo_project.py make | keep` : projet de démonstration `demo_street` (copie de canyon_street_1 dans
@@ -48,12 +51,16 @@ rend la main au défilement (retour en douceur), comme la fin de l'étape.
   lecture ▶ ; ses captures montrent mal les vidéos, les états mesurés font foi).
 
 ## Refaire le film
-1. Hub de test : configuration `hubtest` de `env/hubgui/.claude/launch.json` (port 8811, jamais le hub 8800).
+1. Hub du film : configuration `hubfilm` de `env/hubgui/.claude/launch.json` (port 8811, jamais le hub 8800 ;
+   `NSGA2_RUNS` = `Documents\test\site_opt\runs`, qui doit contenir la copie du run flux et pas le run fictif).
 2. `python tools/film/demo_regen.py` (la démo revient à son état de départ ; la prise la modifie).
 3. Relancer le hub de test (terminal vide), puis `python tools/film/take.py`.
-4. `python tools/film/export_viewer.py` (visionneuse de la scène, avec ses facteurs de forme).
+4. `python tools/film/probe.py <image>` (la vue 3D du hub revient sur demo_street : la prise finit sur
+   canyon_street_1), puis `python tools/film/export_viewer.py` (visionneuse de la scène, avec ses facteurs de forme).
+   Run fictif et son `C:\Domus - FMU\temp_opti\nsga_flux_<jeton>` à la corbeille.
 5. Vérifier `media/` (premières et dernières images, `TOPS_FILM_DUMP`) avant de publier : aucune donnée personnelle.
 
 ## Pas encore fait
-- Étapes suivantes : optimisation de canyon_street_1, résultats, courte simulation avec champs, champs.
+- Étapes suivantes : résultats de l'optimisation, courte simulation avec champs, champs.
+- Netteté sur écrans fins : double densité = 12 images/s seulement (`SCALE` de rec.py), non retenue.
 - Service du téléchargement par code (codes, 5 dernières versions, e-mail aux détenteurs d'un code).

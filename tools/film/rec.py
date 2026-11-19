@@ -25,10 +25,18 @@ from cdp import Browser, OVERLAY_JS, OWN_STORE      # noqa: E402
 
 W, H = 1440, 900
 FPS = 30
-BITRATE = 6_000_000      # bits/s of the clips (a page on the web: ~0.15 bit per pixel and frame)
+BITRATE = 10_000_000     # bits/s of the clips (~0.26 bit per pixel and frame: key frames every 6 frames cost)
 GOP = 6                  # frames from a key frame to the next: the page seeks in the film as one scrolls (both ways)
-SHOT_Q = 72              # JPEG of the screencast: 92 gives 12 pictures/s on a full screen 3D view, 72 about 24
+SCALE = 1                # device pixels per CSS pixel (2 = sharp on fine screens, but 12 pictures/s; 1.5: 17)
+SHOT_Q = 85              # JPEG of the screencast: ~27 pictures/s while the cursor moves (72: 31, 92: 23)
 DUMP = os.environ.get('TOPS_FILM_DUMP')        # folder: one picture every 2 s of film, to check a take
+
+# the drawn cursor glides in the page, one position per picture drawn (ease in / out, as glide())
+GLIDE_JS = """window.__glide = window.__glide || ((x0, y0, x1, y1, ms) => { const t0 = performance.now(), id = (window.__glideId || 0) + 1;
+  window.__glideId = id; const step = now => { if (window.__glideId !== id || !window.__cap) return;
+    const f = Math.min(1, (now - t0) / ms), g = f * f * (3 - 2 * f); __cap.cur(x0 + (x1 - x0) * g, y0 + (y1 - y0) * g, false);
+    if (f < 1) requestAnimationFrame(step); }; requestAnimationFrame(step); });
+"""
 
 # what the film opens: the demo project (tools/film/demo_project.py) in the realistic 3D view, with its neighbourhood
 DEMO = {'hub.form.xdomf90': {'idf': 'demo_street'},
@@ -47,7 +55,7 @@ def store_js(settings, store=None):
 
 class Rec:
     def __init__(self, url, settings=None, port=9341, width=W, height=H, store=DEMO, gpu=True):
-        self.b = Browser(url, width=width, height=height, port=port, gpu=gpu,
+        self.b = Browser(url, width=width, height=height, port=port, gpu=gpu, dsf=SCALE,
                          init_js=store_js(settings or {'theme': 'cream'}, store))
         self.port, self.frames, self.rec = port, [], False
         self.x, self.y = width * .62, height * .55
@@ -69,7 +77,8 @@ class Rec:
         self.ws2 = websocket.create_connection(page['webSocketDebuggerUrl'], max_size=None, suppress_origin=True)
         self.frames, self.rec, self.t0 = [], True, time.time()
         self.ws2.send(json.dumps({'id': 1, 'method': 'Page.startScreencast',
-                                  'params': {'format': 'jpeg', 'quality': SHOT_Q, 'everyNthFrame': 1}}))
+                                  'params': {'format': 'jpeg', 'quality': SHOT_Q, 'everyNthFrame': 1,
+                                             'maxWidth': int(self.w * SCALE), 'maxHeight': int(self.h * SCALE)}}))
         self.th = threading.Thread(target=self._pump, daemon=True)
         self.th.start()
         self.cursor()
@@ -231,17 +240,25 @@ class Rec:
         return self.b.center(sel)
 
     def glide(self, x, y, dur=.7):
-        """Moves the cursor like a hand (ease in / out), the page receives the mouse moves (hover states)."""
-        x0, y0, t0 = self.x, self.y, time.time()
+        """Moves the cursor like a hand (ease in / out), the page receives the mouse moves (hover states).
+        The drawn cursor moves in the page at each of its pictures (GLIDE_JS), not at each call from here (a call
+        costs ~25 ms: ~20 positions a second, a jerky cursor); the mouse moves follow the same curve by the clock."""
+        x0, y0 = self.x, self.y
+        self.cursor()
+        try:
+            self.b.js(GLIDE_JS + '__glide(%f,%f,%f,%f,%f)' % (x0, y0, x, y, dur * 1000))
+        except Exception:
+            pass
+        t0 = time.time()
         while True:                                 # by the clock: the time of a move is `dur` whatever the calls cost
             f = min(1.0, (time.time() - t0) / dur)
             g = f * f * (3 - 2 * f)
             self.x, self.y = x0 + (x - x0) * g, y0 + (y - y0) * g
             self.b.move(self.x, self.y)
-            self.cursor()
             if f >= 1:
                 break
             time.sleep(.012)
+        self.cursor()
 
     def click(self, target, dur=.7, after=.5):
         x, y = self.center(target) if isinstance(target, str) else target

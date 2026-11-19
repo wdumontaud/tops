@@ -25,7 +25,9 @@
       liveTouch: 'Touchez pour prendre la vue en main', liveResume: 'Reprendre la visite guidée',
       s4t: 'Choisir la météo',
       s4p: 'Une fenêtre pour les stations météo du monde entier (17 000). Pour La Rochelle : le climat actuel, ou des climats futurs (RCP 8.5) tirés des projections de Copernicus, sur la période de son choix. On garde ici le climat actuel.',
-      s5t: 'Optimiser la forme de la paroi', soon: 'Bientôt.', steps: 'Étapes'
+      s5t: 'Optimiser la forme de la paroi',
+      s5p: 'En mode Optimisation, la paroi devient un dessin libre de deux matériaux (level-set). Un algorithme génétique cherche celui qui réduit le flux de chaleur à travers la face intérieure ; chaque essai est une co-simulation Domus. Run donne d’abord une estimation du temps. Le run complet a tourné sur le cluster : 4 200 co-simulations sur un an.',
+      s6t: 'Les résultats de l’optimisation', soon: 'Bientôt.', steps: 'Étapes'
     },
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
@@ -47,7 +49,9 @@
       liveTouch: 'Tap to take the view in hand', liveResume: 'Back to the guided tour',
       s4t: 'Choosing the weather',
       s4p: 'One window for the weather stations of the whole world (17,000). For La Rochelle: the present climate, or future climates (RCP 8.5) made from the Copernicus projections, over the period of your choice. Here the present climate is kept.',
-      s5t: 'Optimising the shape of the wall', soon: 'Coming soon.', steps: 'Steps'
+      s5t: 'Optimising the shape of the wall',
+      s5p: 'In Optimisation mode the wall becomes a free drawing of two materials (level-set). A genetic algorithm looks for the one that lowers the heat flux through the internal face; each try is a Domus co-simulation. Run first gives an estimate of the time. The full run was done on the cluster: 4,200 co-simulations over a year.',
+      s6t: 'The results of the optimisation', soon: 'Coming soon.', steps: 'Steps'
     }
   };
   var store = {

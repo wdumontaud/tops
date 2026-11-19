@@ -25,7 +25,8 @@ from cdp import Browser, OVERLAY_JS, OWN_STORE      # noqa: E402
 
 W, H = 1440, 900
 FPS = 30
-BITRATE = 5_000_000      # bits/s of the clips (a page on the web: ~0.13 bit per pixel and frame)
+BITRATE = 6_000_000      # bits/s of the clips (a page on the web: ~0.15 bit per pixel and frame)
+GOP = 6                  # frames from a key frame to the next: the page seeks in the film as one scrolls (both ways)
 SHOT_Q = 72              # JPEG of the screencast: 92 gives 12 pictures/s on a full screen 3D view, 72 about 24
 DUMP = os.environ.get('TOPS_FILM_DUMP')        # folder: one picture every 2 s of film, to check a take
 
@@ -57,6 +58,7 @@ class Rec:
         self.marks = []                 # (time, name of the step starting there)
         self.cuts = []                  # (begin, end) left out of the film
         self.lag = 0.0                  # largest delay of arrival of a frame
+        self.durations = []             # (step, seconds of its clip), written by stop()
 
     # ---- screencast on a second connection to the same page ------------------------------------------------------
     def start(self):
@@ -172,7 +174,7 @@ class Rec:
                     last = j
                 for attempt in (1, 2, 3):          # the encoder page fails now and then ("Failed to fetch")
                     try:
-                        res = encode(paths, os.path.join(media, name + '.mp4'), FPS, repeat=reps, bitrate=BITRATE)
+                        res = encode(paths, os.path.join(media, name + '.mp4'), FPS, repeat=reps, bitrate=BITRATE, gop=GOP)
                         break
                     except RuntimeError as e:
                         print('encoding %s, attempt %d: %s' % (name, attempt, e))
@@ -183,6 +185,7 @@ class Rec:
                 print('%s: %d pictures, %.1f s, %.1f MB' % (os.path.basename(res), len(paths), (k1 - k0) / FPS,
                                                            os.path.getsize(res) / 1e6))
                 out.append(res)
+                self.durations.append((name, (k1 - k0) / FPS))
             finally:
                 shutil.rmtree(tmp, ignore_errors=True)
         return out

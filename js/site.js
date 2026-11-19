@@ -51,8 +51,13 @@
   setLang(lang);
 
   // ---------- top bar line once scrolled ----------
-  var top = document.querySelector('.top');
-  var onScroll = function () { top.classList.toggle('scrolled', window.scrollY > 8); };
+  // hidden while going down past the landing (the application fills the screen), back when going up
+  var top = document.querySelector('.top'), lastY = window.scrollY;
+  var onScroll = function () {
+    var y = window.scrollY, hero = document.querySelector('.hero').offsetHeight;
+    top.classList.toggle('scrolled', y > 8);
+    if (Math.abs(y - lastY) > 4) { top.classList.toggle('away', y > lastY && y > hero * .6); lastY = y; }
+  };
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
 
   // ---------- clips: play from the start when the chapter comes on screen, invite to go on at the end ----------

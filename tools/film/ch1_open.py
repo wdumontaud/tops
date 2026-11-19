@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Clip 1: TOPS opens (start page), the home of the hub, a click on the Domus co-simulation card.
+"""Clip 1: TOPS opens (start page), the home of the hub, a click on the Domus co-simulation card: the demo project
+(tools/film/demo_project.py, demo_regen.py) in the realistic 3D view.
 
     hub for tests first: launch.json "hubtest" (8811)
     python tools/film/ch1_open.py [--port 8811]
@@ -40,7 +41,11 @@ def main():
         r.click(tuple(xy), dur=.9, after=.2)
         r.wait("!document.querySelector('#uxHome') || document.querySelector('#uxHome').hidden"
                " || !document.querySelector('.home-card').offsetWidth", 30)
-        r.pause(2.4)                                       # the co-simulation, ready to be set
+        r.hide_cursor()
+        # the demo project (rec.DEMO) in the realistic 3D view, with its neighbourhood
+        r.wait("(() => { const d = document.getElementById('view').contentDocument;"
+               " return !!d && !!d.querySelector('canvas'); })()", 90)
+        r.pause(4.5)                                       # the co-simulation, ready to be set
         r.hide_cursor()
         r.stop(os.path.join(MEDIA, 'ch1_open.mp4'))
     finally:

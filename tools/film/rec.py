@@ -25,16 +25,25 @@ W, H = 1440, 900
 FPS = 30
 
 
-def store_js(settings):
-    """Storage of a new user + the settings of the hub wanted (theme...)."""
-    return OWN_STORE + ("try { if (!localStorage.getItem('hub.settings')) localStorage.setItem('hub.settings', %s); }"
-                        " catch (e) {}\n" % json.dumps(json.dumps(settings)))
+# what a clip opens: the demo project (tools/film/demo_project.py) in the realistic 3D view, with its neighbourhood
+DEMO = {'hub.form.xdomf90': {'idf': 'demo_street'},
+        'xdomf90_real': '1', 'xdomf90_decor': {'mode': 'quarter', 'shadows': True}}
+
+
+def store_js(settings, store=None):
+    """Storage of a new user + the settings of the hub wanted (theme...) + other keys (written once: the clip
+    can change them)."""
+    keys = dict(store or {}, **{'hub.settings': settings})
+    return OWN_STORE + ''.join(
+        "try { if (localStorage.getItem(%s) === null) localStorage.setItem(%s, %s); } catch (e) {}\n"
+        % (json.dumps(k), json.dumps(k), json.dumps(v if isinstance(v, str) else json.dumps(v)))
+        for k, v in keys.items())
 
 
 class Rec:
-    def __init__(self, url, settings=None, port=9341, width=W, height=H):
-        self.b = Browser(url, width=width, height=height, port=port,
-                         init_js=store_js(settings or {'theme': 'cream'}))
+    def __init__(self, url, settings=None, port=9341, width=W, height=H, store=DEMO, gpu=True):
+        self.b = Browser(url, width=width, height=height, port=port, gpu=gpu,
+                         init_js=store_js(settings or {'theme': 'cream'}, store))
         self.port, self.frames, self.rec = port, [], False
         self.x, self.y = width * .62, height * .55
         self._lock = threading.Lock()

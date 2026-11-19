@@ -42,31 +42,32 @@
     </div>
     <figure class="hero-shot win">
       <div class="win-bar"><i></i><i></i><i></i></div>
-      <img src="media/ch1_open.jpg" alt="" data-i18n-alt="heroAlt">
+      <img src="media/s1_open.jpg" alt="" data-i18n-alt="heroAlt">
     </figure>
-    <a class="more" href="#ch1"><span data-i18n="more">Découvrir l’application</span> <b>↓</b></a>
+    <a class="more" href="#film"><span data-i18n="more">Découvrir l’application</span> <b>↓</b></a>
   </section>
 
-  <!-- ============ chapters: a clip of the real application each ============ -->
-  <section class="chapter" id="ch1" data-clip="media/ch1_open.mp4">
-    <header class="ch-text">
-      <p class="num">01</p>
-      <h2 data-i18n="c1t">Ouvrir TOPS</h2>
-      <p data-i18n="c1p">TOPS s’ouvre comme une application de bureau. L’accueil présente les modèles : on choisit la co-simulation Domus, le bâtiment et sa paroi calculés ensemble.</p>
-    </header>
-    <div class="stage">
-      <video muted playsinline preload="auto" poster="media/ch1_open_first.jpg"></video>
+  <!-- ============ the film: one screen held in place, the steps play one after the other as one scrolls ============ -->
+  <section class="film" id="film">
+    <div class="screen">
+      <video class="v on" muted playsinline preload="auto" poster="media/s1_open_first.jpg"></video>
+      <video class="v" muted playsinline preload="auto"></video>
+      <div class="cap"><p class="num"></p><h2></h2><p class="txt"></p></div>
+      <nav class="dots" aria-label="Étapes"></nav>
       <button class="replay" type="button" data-i18n-title="replay" title="Revoir">↻</button>
-      <a class="next" href="#ch2"><span data-i18n="next">Continuer</span> <b>↓</b></a>
+      <a class="next" href="#film"><span data-i18n="next">Continuer</span> <b>↓</b></a>
+    </div>
+    <!-- one step per screen of scrolling; data-clip: media/<name>.mp4 (+ .jpg = its last picture) -->
+    <div class="steps">
+      <div class="step" data-clip="media/s1_open" data-t="s1t" data-p="s1p"></div>
+      <div class="step" data-clip="media/s2_scene" data-t="s2t" data-p="s2p"></div>
     </div>
   </section>
 
-  <section class="chapter soon" id="ch2">
-    <header class="ch-text">
-      <p class="num">02</p>
-      <h2 data-i18n="c2t">Paramétrer la scène</h2>
-      <p data-i18n="soon">Bientôt.</p>
-    </header>
+  <section class="soon">
+    <p class="num">03</p>
+    <h2 data-i18n="s3t">Se promener dans la vue 3D</h2>
+    <p data-i18n="soon">Bientôt.</p>
   </section>
 </main>
 

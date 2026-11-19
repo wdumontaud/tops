@@ -11,7 +11,7 @@ from rec import Rec      # noqa: E402
 from demo_project import IDF, NAME      # noqa: E402
 
 DAY = 86400
-SCENE = {'floors_1': 3, 'apts_1': 4, 'rows_1': 1, 'orient': 160,
+SCENE = {'floors_1': 3, 'apts_1': 4, 'rows_1': 1, 'orient': 160, 'DX': 5,
          't_start': 160 * DAY, 't_end': 164 * DAY}         # 10 - 14 June: summer trees, cooling
 
 

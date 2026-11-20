@@ -31,7 +31,10 @@
       s6p: 'Le meilleur dessin de chaque génération défile dans la coupe de la paroi. La convergence : de 700 kWh pour le mur plan à 180 kWh, soit −74 %. Puis le dessin optimal face à la référence, et les meilleurs au fil des générations. Un clic le charge dans le formulaire.',
       s7t: 'Simuler le cas optimal',
       s7p: 'Le dessin optimal, en mode Simulation : trois jours de juillet, avec les champs de température et de flux dans la paroi. Domus (le bâtiment et la rue) et le modèle de paroi tournent ensemble, pas à pas.',
-      s8t: 'Les champs dans la paroi', soon: 'Bientôt.', steps: 'Étapes'
+      s8t: 'Les champs dans la paroi',
+      s8p: 'Les résultats en plein écran : Domus (zones, puissances, flux de la façade), puis la température dans la paroi pendant les trois jours, bande par bande, fenêtres comprises. Le soleil chauffe la face extérieure le jour ; le flux horizontal traverse la paroi, le flux vertical suit les blocs du dessin optimal.',
+      endT: 'Essayer TOPS', endP: 'La version 2026.11 (Windows, Linux) se télécharge avec un code d’accès, en haut de cette page.',
+      endBtn: 'Télécharger TOPS', steps: 'Étapes'
     },
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
@@ -59,7 +62,10 @@
       s6p: 'The best drawing of each generation plays in the section of the wall. The convergence: from 700 kWh for the plane wall to 180 kWh, −74 %. Then the optimal drawing against the reference, and the best ones generation after generation. One click loads it into the form.',
       s7t: 'Simulating the optimal case',
       s7p: 'The optimal drawing in Simulation mode: three days of July, with the fields of temperature and heat flux in the wall. Domus (the building and the street) and the wall model run together, step by step.',
-      s8t: 'The fields in the wall', soon: 'Coming soon.', steps: 'Steps'
+      s8t: 'The fields in the wall',
+      s8p: 'The results on the whole screen: Domus (zones, power, fluxes of the facade), then the temperature in the wall over the three days, band by band, windows included. The sun heats the outer face by day; the horizontal flux crosses the wall, the vertical flux follows the blocks of the optimal drawing.',
+      endT: 'Try TOPS', endP: 'Version 2026.11 (Windows, Linux) is downloaded with an access code, at the top of this page.',
+      endBtn: 'Download TOPS', steps: 'Steps'
     }
   };
   var store = {
@@ -361,7 +367,16 @@
         shown = T0;
       } else if (!TAU || Math.abs(target - shown) < .004) shown = target;
       else shown += (target - shown) * (1 - Math.exp(-dt / TAU));
-      if (!onScreen()) { if (shownV && !shownV.paused) shownV.pause(); liveHide(); screen.classList.remove('shown'); return; }
+      if (!onScreen()) {
+        if (shownV && !shownV.paused) shownV.pause(); liveHide(); screen.classList.remove('shown');
+        // still partly in view (leaving it, or after a jump): the picture of the time shown, not an old one
+        var fr = film.getBoundingClientRect(), s0 = segAt(shown);
+        if (fr.top < window.innerHeight && fr.bottom > 0) {
+          if (s0.kind === 'video') showVideo(s0, shown - s0.t0);
+          else if (segs[s0.k - 1] && segs[s0.k - 1].v) showVideo(segs[s0.k - 1], segs[s0.k - 1].dur);
+        }
+        return;
+      }
       screen.classList.add('shown');
       var seg = segAt(shown), local = shown - seg.t0;
       if (seg.kind === 'live') {

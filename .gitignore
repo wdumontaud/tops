@@ -3,3 +3,5 @@
 raw/
 __pycache__/
 desktop.ini
+# notes for Claude (not published)
+.claude/

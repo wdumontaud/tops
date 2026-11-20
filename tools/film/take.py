@@ -11,19 +11,27 @@ the film by scrolling, forwards and backwards; each step starts on the last pict
               its camera and its time (the viewer of the page ends there, the film goes on from that picture)
   s4_weather  the Weather window: the stations of the map, La Rochelle, its present and future climates, the present
               climate kept (the one of the optimisation and of the simulation that follow)
-  s5_optim    the Optimisation mode: the level-set design (my 10), genetic algorithm, objective flux, the estimate of Run,
-              Run (a run of the film: NSGA2_RUNS = the sandbox, hub "hubfilm"), the hub while it runs, the wait cut, the
-              run stopped (off the film), then the run of canyon_street_1 done on the cluster opened from the pill
-              (a copy of it in the sandbox: RUN_SHOWN)
+  s5_optim    the Optimisation mode: the level-set design (my 10), genetic algorithm, objective flux, 200 individuals, a
+              year, the estimate of Run, Run (a run of the film: NSGA2_RUNS = the sandbox, hub "hubfilm"), the hub while
+              it runs; in the cut, the run of the film stopped and the run of canyon_street_1 done on the cluster opened
+              from the pill (a copy in the sandbox: RUN_SHOWN, same name in the film): as if Run had launched it
+  s6_results  the Section tab (best design of each generation), the figures on the whole page (Convergence, Interface,
+              Interfaces), Load # into the form
+  s7_sim      the Simulation mode, three days of July, outputs with fields, Run: a real co-simulation on demo_street
+              (shown as canyon_street_1: ALIAS), never on canyon_street_1; the field movies read in the cut
+  s8_fields   the results on the whole page: Domus, then the field movies (temperature, horizontal and vertical flux),
+              played once over the three days
 
 Before a take (the demo project must be in its first state, the terminal of the hub empty):
     1. hub for the film: launch.json "hubfilm" (8811, optimisation runs in Documents/test/site_opt/runs, with a copy
-       of RUN_SHOWN; after a take: the run of the film and its temp_opti/nsga_flux_<token> of "Domus - FMU" to the recycle bin)
+       of RUN_SHOWN only)
     2. python tools/film/demo_regen.py         (demo_street back to the scene of the film)
     3. hub for the film started again            (its terminal empty)
     4. python tools/film/take.py
-    5. python tools/film/probe.py <png>           (the 3D view of the hub back on demo_street: s5 ends on canyon_street_1)
-    6. python tools/film/export_viewer.py         (the viewer of the last scene, step 3)
+    5. python tools/film/demo_regen.py --final   (the 3D view of the hub back on the scene of the end of s2)
+    6. python tools/film/export_viewer.py         (the viewer of that scene, step 3)
+    7. to the recycle bin: the run of the film (OPT_RUNS) and its temp_opti/nsga_flux_<token> of "Domus - FMU"; the
+       simulation of s7 stays in mod/xdomf90/runs/demo_street (demo_project.py keep moves it at the end)
 """
 import argparse, json, os, sys, time
 
@@ -364,8 +372,71 @@ def step_sim(r):
         r.wait('!' + RUNNING, 3600)
         r.js("setCollapsed(document.getElementById('pTerm'), true)")          # its results, not the terminal
         r.js(TOP)
-        r.pause(8)
+        r.pause(6)
+        warm_fields(r)                                                        # s8: its field movies shown at once
+        r.js(TOP)
+        r.pause(2)
     r.pause(4.5)                                                              # done: its results
+
+
+# the field movie of a tab of the Graphs panel drawn (its colour bar: T, qx, qy) and its player shown
+FIELD_READY = """(() => { const g = document.getElementById('graphsModel'), b = document.getElementById('modelBar');
+  const c = g && g.data && g.data[0] && g.data[0].colorbar && g.data[0].colorbar.title;
+  return !!c && %s.test(c.text || '') && !!b && !b.hidden && !!b.offsetWidth; })()"""
+
+
+FIELD_TABS = [('Temperature field', '/^T/'), ('Horizontal flux', '/^q<sub>x/'), ('Vertical flux', '/^q<sub>y/')]
+DOMUS_READY = "(() => { const b = [...document.querySelectorAll('#pGraphs button.dom')].find(e => e.offsetWidth); return !!b && b.classList.contains('on'); })()"
+
+
+def warm_fields(r):
+    """The field movies of the run read once (off the film: each tab then shows at once), the Domus tab back."""
+    for tab, unit in FIELD_TABS:
+        r.js("(() => { const e = [...document.querySelectorAll('#pGraphs button')].find(x => x.textContent.trim() === %s && x.offsetWidth);"
+             " e.click(); })()" % json.dumps(tab))
+        r.wait(FIELD_READY % unit, 120)
+        r.pause(.5)
+    r.js("[...document.querySelectorAll('#pGraphs button.dom')].find(e => e.offsetWidth).click()")
+    r.wait(DOMUS_READY, 60)
+    r.pause(2)
+
+
+def field_tab(r, tab, after):
+    unit = dict(FIELD_TABS)[tab]
+    x, y = txq(r, '#pGraphs button', tab)
+    if r.y > y + 30:                                    # up beside the maps, then along the tabs: no tooltip of the maps
+        r.glide(r.x, y + 18, .6)
+    r.click((x, y), dur=.7, after=.1)
+    t0 = time.time()
+    r.wait(FIELD_READY % unit, 60)
+    print('  %s drawn in %.1f s' % (tab, time.time() - t0))
+    r.pause(after)
+
+
+def step_fields(r):
+    r.js("(() => { const s = document.getElementById('modelSpeed'); s.value = '1'; s.dispatchEvent(new Event('change')); })()")
+    r.x, r.y = r.w * .55, r.h * .7
+    r.cursor()
+    r.click('#pGraphs .ux-fullbtn', dur=1.0, after=2.4)                      # the results on the whole page (Domus)
+    field_tab(r, 'Temperature field', 1.6)                                    # the wall: its temperature
+    r.click('#modelPlay', dur=.9, after=.3)                                   # the three days (once: no loop)
+    t0 = time.time()
+    loop = r.js("movieCount / (movieFps * (+document.getElementById('modelSpeed').value || 1))")
+    rest = (r.w * .85, r.h * .82)                                             # off the maps (their tooltips)
+    r.glide(*rest, 1.0)
+    r.pause(6.6)                                                              # the sun on the outer face, the nights
+    field_tab(r, 'Horizontal flux', .3)                                       # the heat flux across the wall
+    r.glide(*rest, .9)
+    r.pause(3.6)
+    field_tab(r, 'Vertical flux', .3)                                         # along it: the blocks of the design
+    r.glide(*rest, .9)
+    r.pause(3.0)
+    field_tab(r, 'Temperature field', .3)
+    r.glide(*rest, .9)
+    r.hide_cursor()
+    left = loop - .6 - (time.time() - t0)
+    print('  movie: %.1f s, %.1f s left' % (loop, left))
+    r.pause(max(.5, min(2.5, left)))
 
 
 def main():
@@ -402,6 +473,8 @@ def main():
         step_results(r)
         r.mark('s7_sim')
         step_sim(r)
+        r.mark('s8_fields')
+        step_fields(r)
         r.stop(MEDIA, first='s1_open')
         film = {'frame': [r.w, r.h], 'clips': {n: round(d, 3) for n, d in r.durations}, 'live': live}
         with open(os.path.join(MEDIA, 'film.json'), 'w', encoding='utf-8') as fh:

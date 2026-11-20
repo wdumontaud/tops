@@ -86,7 +86,7 @@ RUNNING = "JOBS.some(j => j.status === 'running')"
 # optimisation run shown (the page of the film only: its text, never what is sent to the hub)
 DEMO_IDF = 'demo_street'
 # the page of the film shows no folder of this computer (the user's name is in it): they become C:\TOPS, C:\Users\user
-ENV_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..', 'env'))
+ENV_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', '..', '..', 'env'))
 HOME_DIR = os.path.normpath(os.path.expanduser('~'))
 ALIAS = {DEMO_IDF: 'canyon_street_1', ENV_DIR: 'C:\\TOPS', ENV_DIR.replace('\\', '/'): 'C:/TOPS',
          HOME_DIR: 'C:\\Users\\user', HOME_DIR.replace('\\', '/'): 'C:/Users/user'}

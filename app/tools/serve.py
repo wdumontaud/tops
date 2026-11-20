@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Local preview of the site: python tools/serve.py [port]  (default 8840, 127.0.0.1 only).
+"""Local preview of the whole site (webpage/: the home page at /, this page at /app/): python tools/serve.py [port]
+(default 8840, 127.0.0.1 only).
 
 Answers Range requests like GitHub Pages: without them a browser cannot seek in a video (the film shows the last
 picture of a step when one scrolls back up)."""
 import functools, http.server, os, re, sys
 
-ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
 port = int(os.environ.get('PORT') or (sys.argv[1] if len(sys.argv) > 1 else 8840))   # PORT: preview of the app
 
 

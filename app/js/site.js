@@ -8,7 +8,7 @@
     fr: {
       tagline: 'Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment',
       lead: 'TOPS couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis optimise la forme et la topologie de cette paroi. Le film qui suit parcourt l’application sur un cas réel : une rue de La Rochelle, de la scène urbaine aux champs de température dans la paroi optimale.',
-      home: 'Accueil', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille Université',
+      home: 'Accueil', barTitle: 'L’application TOPS', dlJump: 'Télécharger', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille Université',
       dlTitle: 'Télécharger TOPS', dlLabel: 'Code d’accès', dlPh: 'Code d’accès', dlBtn: 'Télécharger',
       dlNote: 'Le code est personnel ; ses détenteurs sont prévenus des nouvelles versions.',
       dlEmpty: 'Entrez le code que vous avez reçu.',
@@ -38,7 +38,7 @@
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
       lead: 'TOPS couples the thermal simulation of a building (Domus) with a fine model of its wall, then optimises the shape and the topology of that wall. The film below goes through the application on a real case: a street of La Rochelle, from the urban scene to the temperature fields in the optimal wall.',
-      home: 'Home', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille University',
+      home: 'Home', barTitle: 'The TOPS application', dlJump: 'Download', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille University',
       dlTitle: 'Download TOPS', dlLabel: 'Access code', dlPh: 'Access code', dlBtn: 'Download',
       dlNote: 'The code is personal; its holders are told of new versions.',
       dlEmpty: 'Enter the code you received.',
@@ -70,7 +70,7 @@
     get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { /* private window */ } }
   };
-  var lang = store.get('tops.lang') || ((navigator.language || 'fr').slice(0, 2) === 'fr' ? 'fr' : 'en');
+  var lang = store.get('webpage.lang') || ((navigator.language || 'fr').slice(0, 2) === 'fr' ? 'fr' : 'en');
   var setLang = function (l) {
     lang = T[l] ? l : 'fr';
     document.documentElement.lang = lang;
@@ -80,20 +80,32 @@
     document.querySelectorAll('[data-i18n-alt]').forEach(function (e) { e.alt = t[e.dataset.i18nAlt]; });
     document.querySelectorAll('[data-i18n-title]').forEach(function (e) { e.title = t[e.dataset.i18nTitle]; });
     document.querySelectorAll('.lang button').forEach(function (b) { b.classList.toggle('on', b.dataset.lang === lang); });
-    store.set('tops.lang', lang);
+    store.set('webpage.lang', lang);
     if (window.__filmLang) window.__filmLang();
   };
   document.querySelectorAll('.lang button').forEach(function (b) { b.onclick = function () { setLang(b.dataset.lang); }; });
   setLang(lang);
 
-  // ---------- top bar line once scrolled ----------
-  // hidden while going down past the landing (the application fills the screen), back when going up
-  var top = document.querySelector('.top'), lastY = window.scrollY;
+  // ---------- the bar at the top (../css/bar.css) ----------
+  // hidden while the film fills the screen and one goes down it (the application on the whole screen), back going up
+  var bar = document.querySelector('.bar'), filmBox = document.getElementById('film'), lastY = window.scrollY;
   var onScroll = function () {
-    var y = window.scrollY, hero = document.querySelector('.hero').offsetHeight;
-    if (Math.abs(y - lastY) > 4) { top.classList.toggle('away', y > lastY && y > hero * .6); lastY = y; }
+    var y = window.scrollY, r = filmBox.getBoundingClientRect(), H = window.innerHeight;
+    var held = r.top <= 1 && r.bottom >= H - 1 && !filmBox.querySelector('.screen').classList.contains('framed');
+    if (!held) { bar.classList.remove('away'); lastY = y; return; }
+    if (Math.abs(y - lastY) > 4) { bar.classList.toggle('away', y > lastY); lastY = y; }
   };
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // Download: straight to the form at the end of the page, past the film
+  var jump = document.querySelector('.dl-jump'), dlBox = document.getElementById('download');
+  if (jump && dlBox) jump.addEventListener('click', function (e) {
+    e.preventDefault();
+    if (window.__film && window.__film.stop) window.__film.stop();
+    window.scrollTo({top: dlBox.getBoundingClientRect().top + window.scrollY, behavior: 'instant'});
+    var inp = document.getElementById('dlCode');
+    if (inp && !(window.matchMedia && matchMedia('(pointer: coarse)').matches)) inp.focus({preventScroll: true});
+  });
 
   // ---------- the background of the home page (js/field.js): drawn only where the film does not cover the screen ----------
   (function () {
@@ -442,7 +454,7 @@
       cap.querySelector('h2').textContent = 'media/film.json ?'; cap.classList.add('in');
     });
     window.__film = {get t() { return shown; }, get total() { return total; }, segs: segs,
-                     get free() { return free; }, get auto() { return auto; }, seek: function (t) { stopAuto(); seekTo(t, false); }};
+                     get free() { return free; }, get auto() { return auto; }, stop: function () { stopAuto(); }, seek: function (t) { stopAuto(); seekTo(t, false); }};
   })();
 
 

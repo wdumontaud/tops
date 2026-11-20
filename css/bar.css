@@ -1,0 +1,29 @@
+/* css/bar.css — the bar at the top of every page of the site (index.html, articles/, app/): home, title, language and
+   the actions of the page. Every page keeps the language in localStorage 'webpage.lang'. */
+.bar{position:fixed;left:0;right:0;top:0;z-index:10;display:grid;grid-template-columns:1fr minmax(0,auto) 1fr;align-items:center;
+  gap:12px;padding:10px 18px;min-height:52px;color:#fff;background:rgba(0,41,75,.55);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.14);transition:transform .35s ease}
+.bar.away{transform:translateY(-100%)}
+.bar .side{display:flex;align-items:center;gap:10px;min-width:0}
+.bar .side.right{justify-content:flex-end}
+.bar h1{margin:0;font-size:clamp(17px,2.2vw,24px);font-weight:700;letter-spacing:.02em;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home{display:inline-flex;align-items:center;gap:7px;color:#fff;text-decoration:none;font-size:14px;font-weight:700;
+  letter-spacing:.02em;opacity:.85;white-space:nowrap}
+.home svg{flex:none}
+a.home:hover{opacity:1;color:#FEEA6D}
+.home[aria-current]{opacity:1;cursor:default}
+.lang{display:flex;border:1px solid rgba(255,255,255,.35);border-radius:8px;overflow:hidden}
+.lang button{font:inherit;font-weight:700;font-size:12px;letter-spacing:.06em;padding:5px 10px;border:0;background:transparent;
+  color:rgba(255,255,255,.75);cursor:pointer}
+.lang button+button{border-left:1px solid rgba(255,255,255,.25)}
+.lang button.on{background:#fff;color:#00294B}
+.bar .act{font:inherit;font-weight:700;font-size:13px;letter-spacing:.03em;padding:5px 12px;border-radius:8px;text-decoration:none;
+  color:#00294B;background:#FEEA6D;white-space:nowrap}
+.bar .act:hover{background:#fff3a6}
+@media (max-width:640px){
+  .bar{padding:8px 12px;gap:8px;min-height:46px}
+  .bar h1{font-size:15px}
+  .home span{display:none}
+}
+@media (max-width:420px){ .bar h1{display:none} }

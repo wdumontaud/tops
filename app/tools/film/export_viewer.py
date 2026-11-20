@@ -19,7 +19,7 @@ import argparse, json, os, re, shutil, socket, sys, time, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SITE = os.path.normpath(os.path.join(HERE, '..', '..'))
-HUB = os.path.normpath(os.path.join(SITE, '..', '..', 'env', 'hubgui'))
+HUB = os.path.normpath(os.path.join(SITE, '..', '..', '..', 'env', 'hubgui'))
 OUT = os.path.join(SITE, 'viewer')
 VENDOR = ('three.min.js', 'OrbitControls.js', 'Sky.js')
 

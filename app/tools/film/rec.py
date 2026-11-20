@@ -18,7 +18,7 @@ import websocket
 from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-HUB = os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', 'env', 'hubgui'))
+HUB = os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', '..', 'env', 'hubgui'))
 sys.path.insert(0, os.path.join(HUB, 'tools', 'help'))
 sys.path.insert(0, HUB)
 from cdp import Browser, OVERLAY_JS, OWN_STORE      # noqa: E402

@@ -9,7 +9,7 @@ import argparse, base64, io, json, os, sys, time
 from PIL import Image, ImageChops
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(HERE, '..', '..', '..', 'env', 'hubgui', 'tools', 'help'))
+sys.path.insert(0, os.path.join(HERE, '..', '..', '..', '..', 'env', 'hubgui', 'tools', 'help'))
 from cdp import Browser      # noqa: E402
 
 ERRS = "window.__errs = []; addEventListener('error', e => __errs.push(String(e.message)));" \
@@ -34,7 +34,7 @@ def main():
     ap.add_argument('--h', type=int, default=900)
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
-    b = Browser('http://127.0.0.1:%d/?t=%d' % (a.port, time.time()), width=a.w, height=a.h, port=9345, gpu=True, init_js=ERRS)
+    b = Browser('http://127.0.0.1:%d/app/?t=%d' % (a.port, time.time()), width=a.w, height=a.h, port=9345, gpu=True, init_js=ERRS)
     n = [0]
 
     def shot(tag):

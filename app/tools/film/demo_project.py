@@ -9,7 +9,7 @@ The hub can only read projects in mod/xdomf90/idf (xd_base.IDF_DIR): the copy li
 import json, os, shutil, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-IDF = os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', 'env', 'mod', 'xdomf90', 'idf'))
+IDF = os.path.normpath(os.path.join(HERE, '..', '..', '..', '..', '..', 'env', 'mod', 'xdomf90', 'idf'))
 SRC, NAME = 'canyon_street_1', 'demo_street'
 KEEP = os.path.join(os.path.expanduser('~'), 'Documents', 'test', 'site_demo')
 

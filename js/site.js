@@ -101,7 +101,8 @@
     if (!fld) return;                                              // no WebGL2: the plain blue stays
     var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     var film = document.getElementById('film');
-    var covered = function () { var r = film.getBoundingClientRect(); return r.top <= 0 && r.bottom >= window.innerHeight; };
+    var scr = film.querySelector('.screen');
+    var covered = function () { var r = film.getBoundingClientRect(); return r.top <= 0 && r.bottom >= window.innerHeight && !scr.classList.contains('framed'); };
     if (still) { fld.draw(20); window.addEventListener('resize', function () { fld.draw(20); }); return; }
     var tick = function (ms) { requestAnimationFrame(tick); if (!covered()) fld.draw(ms / 1000 + 20); };
     requestAnimationFrame(tick);
@@ -124,6 +125,8 @@
     var TAU = reduce ? 0 : 0.11;   // smoothing of the scrolling (s): the wheel goes by notches
     var segs = [], total = 0, FR = [1440, 900], LIVE = null, ready = false;
     var PX = function () { return Math.max(70, window.innerHeight * 0.13); };
+    var OUT = function () { return Math.round(window.innerHeight * 0.7); };   // scrolling after the end: the window shrinks
+    var SMALL = 0.56;                                                          // its size on the blue (part of the screen)
 
     // ---- the timeline, once film.json is read
     var build = function (cfg) {
@@ -155,7 +158,7 @@
     var layout = function () {
       if (!segs.length) return;
       var px = PX();
-      stepsBox.style.height = (total * px + window.innerHeight) + 'px';
+      stepsBox.style.height = (total * px + window.innerHeight + OUT()) + 'px';
       segs.forEach(function (s) { s.st.style.top = (s.t0 * px) + 'px'; s.st.style.height = (s.dur * px) + 'px'; });
     };
     var tOfScroll = function () { return Math.max(0, Math.min(total, (window.scrollY - film.offsetTop) / PX())); };
@@ -354,9 +357,36 @@
       var r = track.getBoundingClientRect(); stopAuto(); seekTo(total * Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)), true);
     };
 
+    // ---- the window of the film on the blue: it grows while it comes up (the top of the film), to the whole screen
+    // when it holds; after the last picture it shrinks back while held, then leaves (a function of the scrolling only)
+    var shape = '';
+    var frameShape = function () {
+      var r = film.getBoundingClientRect(), H = window.innerHeight, g = 1, org = '50% 0';
+      if (r.top > 0) g = 1 - r.top / H;
+      else if (segs.length) {
+        var tail = window.scrollY - yOfT(total);
+        if (tail > 0) { g = 1 - tail / OUT(); org = '50% 50%'; }
+      }
+      g = ease(g); if (g > .9995) g = 1;
+      var key = g >= 1 ? 'full' : g.toFixed(4) + org;
+      if (key === shape) return;
+      shape = key;
+      if (g >= 1) {
+        screen.classList.remove('framed'); screen.style.transform = ''; screen.style.borderRadius = ''; screen.style.boxShadow = '';
+        return;
+      }
+      var k = SMALL + (1 - SMALL) * g;
+      screen.classList.add('framed');
+      screen.style.transformOrigin = org;
+      screen.style.transform = 'scale(' + k.toFixed(4) + ')';
+      screen.style.borderRadius = (16 * (1 - g) / k).toFixed(1) + 'px';
+      screen.style.boxShadow = '0 ' + (40 / k).toFixed(0) + 'px ' + (110 / k).toFixed(0) + 'px rgba(0,8,20,' + (.55 * (1 - g)).toFixed(3) + ')';
+    };
+
     // ---- each frame of the browser
     var loop = function (now) {
       requestAnimationFrame(loop);
+      frameShape();
       var dt = last === null ? 0 : Math.min(.1, (now - last) / 1000); last = now;
       var target = tOfScroll();
       if (auto) {

@@ -6,20 +6,19 @@
 <title>TOPS — l’application</title>
 <meta name="description" content="TOPS : optimisation énergétique de la topologie et de la forme d'une paroi de bâtiment. Visite de l'application.">
 <link rel="icon" href="../assets/tops.png">
-<link rel="stylesheet" href="../css/bar.css?v=2026-11-20f">
-<link rel="stylesheet" href="css/site.css?v=2026-11-20f">
+<link rel="stylesheet" href="../css/bar.css?v=2026-11-20h">
+<link rel="stylesheet" href="css/site.css?v=2026-11-20h">
 </head>
 <body>
 
 <!-- the background of the home page (../webpage): white iso-lines on the CNRS blue (js/field.js, same field) -->
 <canvas id="field" data-line="255,255,255" data-alpha="0.5"></canvas>
 
-<!-- the bar of every page of the site (../css/bar.css); Download: straight to the end of the page, past the film -->
+<!-- the bar of every page of the site (../css/bar.css) -->
 <header class="bar">
   <div class="side"><a class="home" href="../index.html"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h4.5v-6h3v6H18V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="home">Accueil</span></a></div>
   <h1 data-i18n="barTitle">L’application TOPS</h1>
   <div class="side right">
-    <a class="act dl-jump" href="#download"><span data-i18n="dlJump">Télécharger</span> ↓</a>
     <div class="lang" role="group" aria-label="Langue / Language" title="Langue / Language">
       <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
     </div>
@@ -32,8 +31,10 @@
     <p class="kicker"><img src="../assets/tops.png" alt="" width="26" height="26"><span>TOPS</span></p>
     <h1 data-i18n="tagline">Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment</h1>
     <p class="lead" data-i18n="lead">TOPS couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis optimise la forme et la topologie de cette paroi. Le film qui suit parcourt l’application sur un cas réel : une rue de La Rochelle, de la scène urbaine aux champs de température dans la paroi optimale.</p>
+    <!-- Download: straight to the end of the page, past the film (js/site.js) -->
     <div class="more"><a href="#film"><span data-i18n="more">Parcourir l’application</span> <b>↓</b></a>
-      <button class="watch" type="button">▶ <span data-i18n="watch">Lecture continue</span></button></div>
+      <button class="watch" type="button">▶ <span data-i18n="watch">Lecture continue</span></button>
+      <a class="dl-jump" href="#download"><span data-i18n="dlJump">Télécharger</span> <b>↓</b></a></div>
   </section>
 
   <!-- ============ the film: one screen held in place; the scrolling is its time (forwards, backwards, still) ============ -->
@@ -75,6 +76,7 @@
       <div class="dl-row">
         <input id="dlCode" name="code" type="text" inputmode="text" spellcheck="false" data-i18n-ph="dlPh" placeholder="Code d’accès">
         <button class="btn" type="submit" data-i18n="dlBtn">Télécharger</button>
+        <span class="os" role="img" aria-label="Windows, Linux" title="Windows · Linux"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5.3 10.4 4.3v7.1H3zM11.3 4.2 21 2.8v8.6h-9.7zM3 12.4h7.4v7.2L3 18.6zM11.3 12.4H21v8.7l-9.7-1.3z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c-2.4 0-3.8 2-3.8 4.6 0 1.3.3 2.2-.4 3.4C6.4 12.2 5 14.4 5 17c0 2.7 2.9 4.6 7 4.6s7-1.9 7-4.6c0-2.6-1.4-4.8-2.8-7-.7-1.2-.4-2.1-.4-3.4C15.8 4 14.4 2 12 2z"/><ellipse cx="12" cy="16" rx="3.5" ry="4.3" fill="var(--blue)"/><circle cx="10.6" cy="6.3" r=".95" fill="var(--blue)"/><circle cx="13.4" cy="6.3" r=".95" fill="var(--blue)"/><path d="M10.6 8.3h2.8L12 10z" fill="var(--yellow)"/><ellipse cx="8.4" cy="21.3" rx="2.6" ry="1.2" fill="var(--yellow)"/><ellipse cx="15.6" cy="21.3" rx="2.6" ry="1.2" fill="var(--yellow)"/></svg></span>
       </div>
       <p class="dl-note" id="dlNote" data-i18n="dlNote">Le code est personnel ; ses détenteurs sont prévenus des nouvelles versions.</p>
     </form>
@@ -85,8 +87,8 @@
   <p class="credit" data-i18n="credit">William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille Université</p>
 </footer>
 
-<script src="media/film.js?v=2026-11-20f"></script>
-<script src="../js/field.js?v=2026-11-20f"></script>
-<script src="js/site.js?v=2026-11-20f"></script>
+<script src="media/film.js?v=2026-11-20h"></script>
+<script src="../js/field.js?v=2026-11-20h"></script>
+<script src="js/site.js?v=2026-11-20h"></script>
 </body>
 </html>

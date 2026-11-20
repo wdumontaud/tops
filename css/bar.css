@@ -26,4 +26,4 @@ a.home:hover{opacity:1;color:#FEEA6D}
   .bar h1{font-size:15px}
   .home span{display:none}
 }
-@media (max-width:420px){ .bar h1{display:none} }
+@media (max-width:420px){ .bar{grid-template-columns:auto 1fr} .bar h1{display:none} }

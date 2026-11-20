@@ -33,7 +33,7 @@
       s7p: 'Le dessin optimal, en mode Simulation : trois jours de juillet, avec les champs de température et de flux dans la paroi. Domus (le bâtiment et la rue) et le modèle de paroi tournent ensemble, pas à pas.',
       s8t: 'Les champs dans la paroi',
       s8p: 'Les résultats en plein écran : Domus (zones, puissance de refroidissement, flux de la façade), puis la température dans la paroi pendant les trois jours, bande par bande, fenêtres comprises. Le soleil chauffe la face extérieure le jour, le flux horizontal traverse la paroi ; enfin la part ensoleillée de la façade, aux mêmes instants.',
-      endP: 'Version 2026.11, pour Windows et Linux, avec le code d’accès qui vous a été transmis.', steps: 'Étapes'
+      endP: 'Version 2026.11, avec le code d’accès qui vous a été transmis.', steps: 'Étapes'
     },
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
@@ -63,7 +63,7 @@
       s7p: 'The optimal drawing in Simulation mode: three days of July, with the fields of temperature and heat flux in the wall. Domus (the building and the street) and the wall model run together, step by step.',
       s8t: 'The fields in the wall',
       s8p: 'The results on the whole screen: Domus (zones, cooling power, fluxes of the facade), then the temperature in the wall over the three days, band by band, windows included. The sun heats the outer face by day, the horizontal flux crosses the wall; last, the sunlit part of the facade at the same instants.',
-      endP: 'Version 2026.11, for Windows and Linux, with the access code you were given.', steps: 'Steps'
+      endP: 'Version 2026.11, with the access code you were given.', steps: 'Steps'
     }
   };
   var store = {

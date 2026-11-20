@@ -60,11 +60,15 @@ const Objects=(()=>{
       });
     }
 
-    let ftRect=null;   // zone du crédit en bas : les objets n'y entrent pas (le haut est libre)
+    // zones interdites aux objets : le crédit en bas (repoussés vers le haut), la langue en haut (vers le bas)
+    let blocks=[];
     function layout(){
       const W=innerWidth, H=innerHeight;
-      const ft=document.querySelector('.foot');
-      if(ft){ const r=ft.getBoundingClientRect(); ftRect={l:r.left,t:r.top,r:r.right,b:r.bottom}; }
+      blocks=[];
+      [['.foot',-1],['.lang-float',1]].forEach(([sel,dir])=>{
+        const e=document.querySelector(sel); if(!e) return;
+        const r=e.getBoundingClientRect(); blocks.push({l:r.left,t:r.top,r:r.right,b:r.bottom,dir});
+      });
       objs.forEach(o=>{
         o.w=o.el.offsetWidth; o.h=o.el.offsetHeight;
         if(!o.placed){ o.x=o.fx*W; o.y=o.fy*H; o.placed=true; }
@@ -135,13 +139,14 @@ const Objects=(()=>{
         const mX=o.w/2+6, mY=o.h/2+6;
         if(o.x<mX){o.x=mX;o.vx=Math.abs(o.vx)*.6;} else if(o.x>W-mX){o.x=W-mX;o.vx=-Math.abs(o.vx)*.6;}
         if(o.y<mY){o.y=mY;o.vy=Math.abs(o.vy)*.6;} else if(o.y>H-mY){o.y=H-mY;o.vy=-Math.abs(o.vy)*.6;}
-        // zone du crédit (en bas) : on pousse doucement vers le haut
-        if(ftRect){
-          const pad=o.h/2+10;
-          if(o.x>ftRect.l-pad&&o.x<ftRect.r+pad&&o.y>ftRect.t-pad&&o.y<ftRect.b+pad){
-            o.y=ftRect.t-pad; o.vy=-Math.abs(o.vy)*.5-30;
+        // zones interdites (crédit, langue) : l'objet est repoussé hors de la zone (même pendant un glisser)
+        blocks.forEach(z=>{
+          const px=o.w/2+10, py=o.h/2+10;
+          if(o.x>z.l-px&&o.x<z.r+px&&o.y>z.t-py&&o.y<z.b+py){
+            if(z.dir<0){ o.y=z.t-py; o.vy=-Math.abs(o.vy)*.5-30; }
+            else{ o.y=z.b+py; o.vy=Math.abs(o.vy)*.5+30; }
           }
-        }
+        });
         // léger tilt dans la direction du mouvement
         const tilt=o.dragging?0:clamp(o.vx*.012,-.12,.12);
         o.r+=(tilt-o.r)*Math.min(1,dt*4);

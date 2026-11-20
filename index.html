@@ -14,16 +14,11 @@
 <!-- fond animé : iso-lignes blanches sur bleu CNRS, comme la slide 1 de meeting/PUCPR_seminar2 -->
 <canvas id="field" data-line="255,255,255" data-alpha="0.5"></canvas>
 
-<!-- bandeau commun à toutes les pages (css/bar.css) ; langue gardée dans localStorage 'webpage.lang' (js/i18n.js) -->
-<header class="bar">
-  <div class="side"><span class="home" aria-current="page"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h4.5v-6h3v6H18V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="home">Accueil</span></span></div>
-  <span></span>
-  <div class="side right">
-    <div class="lang" role="group" aria-label="Langue / Language" title="Langue / Language">
-      <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
-    </div>
-  </div>
-</header>
+<!-- pas de bandeau sur l'accueil (les autres pages : css/bar.css) : la langue seule, en haut à droite ; gardée dans
+     localStorage 'webpage.lang' (js/i18n.js) ; les bulles n'y passent pas (js/objects.js, zones interdites) -->
+<div class="lang lang-float" role="group" aria-label="Langue / Language" title="Langue / Language">
+  <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
+</div>
 
 <header class="masthead">
   <h1 class="tag" data-i18n="tagline">Optimisation de la forme et du domaine d’isolation au regard de l’efficacité énergétique des parois</h1>

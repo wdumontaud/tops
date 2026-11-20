@@ -93,6 +93,7 @@
     var y = window.scrollY, r = filmBox.getBoundingClientRect(), H = window.innerHeight;
     var held = r.top <= 1 && r.bottom >= H - 1 && !filmBox.querySelector('.screen').classList.contains('framed');
     if (!held) { bar.classList.remove('away'); lastY = y; return; }
+    if (window.__film && window.__film.mode) { bar.classList.add('away'); lastY = y; return; }   // phones: the film has the screen
     if (Math.abs(y - lastY) > 4) { bar.classList.toggle('away', y > lastY); lastY = y; }
   };
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
@@ -160,11 +161,11 @@
       total = t0;
       // one dot per step on the track (where it starts)
       segs.forEach(function (s) {
-        var d = document.createElement('a'); d.href = '#film'; d.style.top = (s.t0 / total * 100) + '%';
+        var d = document.createElement('a'); d.href = '#film'; d.style.setProperty('--at', (s.t0 / total * 100) + '%');
         d.onclick = function (e) { e.preventDefault(); e.stopPropagation(); stopAuto(); seekTo(s.t0 + .01, true); };
         dots.appendChild(d);
       });
-      layout(); ready = true; window.__filmLang();
+      setMode(); layout(); ready = true; window.__filmLang();
       requestAnimationFrame(loop);
     };
     var layout = function () {
@@ -185,7 +186,17 @@
     var onScreen = function () { var r = film.getBoundingClientRect(); return r.top < window.innerHeight * .5 && r.bottom > window.innerHeight * .5; };
 
     // ---- clips: loaded around the step shown; one shown at a time (the next starts on the last picture of the one before)
-    var want = function (s) { if (s && s.v && !s.v.src) { s.v.preload = 'auto'; s.v.src = s.v.dataset.src; } };
+    var want = function (s) {
+      if (!s || !s.v || s.v.src) return;
+      var v = s.v; v.preload = 'auto'; v.src = v.dataset.src;
+      if (coarse && !auto) { var pr = v.play(); if (pr && pr.then) pr.then(function () { if (!(auto && shownV === v)) v.pause(); }, function () {}); }
+    };
+    // play a clip once (a phone has no data before play: do not wait for it)
+    var playV = function (v) {
+      if (v._pp) return;
+      var pr = v.play();
+      if (pr && pr.then) { v._pp = true; pr.then(function () { v._pp = false; }, function () { v._pp = false; }); }
+    };
     var shownV = null;
     var showVideo = function (s, local, follow) {      // follow: played (Play), not sought
       want(s); want(segs[s.k + 1]); want(segs[s.k - 1]);
@@ -227,11 +238,12 @@
     var lerp = function (a, b, f) { return a + (b - a) * f; };
     // the box of the picture of the film on the screen (object-fit: contain)
     var picBox = function () {
+      if (pB && geo) return geo;
       var Ws = screen.clientWidth, Hs = screen.clientHeight, s = Math.min(Ws / FR[0], Hs / FR[1]);
       return {s: s, x: (Ws - FR[0] * s) / 2, y: (Hs - FR[1] * s) / 2};
     };
     var placeLive = function (p) {          // p: 0 = over the 3D view of the picture, 1 = the whole screen
-      var b = picBox(), r = LIVE.rect, Ws = screen.clientWidth, Hs = screen.clientHeight;
+      var b = picBox(), r = LIVE.rect, Ws = screen.clientWidth, Hs = pB && geo ? geo.ph : screen.clientHeight;   // portrait phone: the picture part
       var x = lerp(b.x + r[0] * b.s, 0, p), y = lerp(b.y + r[1] * b.s, 0, p);
       var w = lerp(r[2] * b.s, Ws, p), h = lerp(r[3] * b.s, Hs, p), sc = lerp(Math.min(b.s, 1), 1, p);
       var key = [x, y, w, h, sc].map(function (v) { return v.toFixed(1); }).join();
@@ -324,13 +336,13 @@
       var t = T[lang];
       if (s.k !== curK) {
         curK = s.k;
-        cap.classList.remove('in'); capIn = false;
+        cap.classList.remove('in', 'open'); capIn = false;
         cap.querySelector('.num').textContent = ('0' + (s.k + 1)).slice(-2);
         cap.querySelector('h2').textContent = t[s.st.dataset.t];
         cap.querySelector('.txt').textContent = t[s.st.dataset.p];
         dots.querySelectorAll('a').forEach(function (d, i) { d.classList.toggle('on', i === s.k); });
       }
-      var from = s.kind === 'live' ? EXP : 0.15, on = local >= from && local < from + CAP_S;
+      var from = s.kind === 'live' ? EXP : 0.15, on = pB || lc || (local >= from && local < from + CAP_S);
       if (on !== capIn) { capIn = on; cap.classList.toggle('in', on); }
     };
     window.__filmLang = function () {
@@ -360,13 +372,14 @@
     var watch = document.querySelector('.watch');
     if (watch) watch.onclick = function () { shown = 0; seekTo(0, false); setTimeout(startAuto, 50); };
     ['wheel', 'touchstart', 'mousedown'].forEach(function (k) {
-      window.addEventListener(k, function (e) { if (auto && !(e.target.closest && e.target.closest('.ctl'))) stopAuto(); }, {passive: true});
+      window.addEventListener(k, function (e) { if (auto && !(e.target.closest && e.target.closest('.ctl, .cap'))) stopAuto(); }, {passive: true});
     });
     window.addEventListener('keydown', function (e) {
       if (auto && ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' ', 'Home', 'End'].indexOf(e.key) >= 0) stopAuto();
     });
     track.onclick = function (e) {
-      var r = track.getBoundingClientRect(); stopAuto(); seekTo(total * Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)), true);
+      var r = track.getBoundingClientRect(), f = pB ? (e.clientX - r.left) / r.width : (e.clientY - r.top) / r.height;
+      stopAuto(); seekTo(total * Math.max(0, Math.min(1, f)), true);
     };
 
     // ---- the window of the film on the blue: it grows while it comes up (the top of the film), to the whole screen
@@ -395,6 +408,51 @@
       screen.style.boxShadow = '0 ' + (40 / k).toFixed(0) + 'px ' + (110 / k).toFixed(0) + 'px rgba(0,8,20,' + (.55 * (1 - g)).toFixed(3) + ')';
     };
 
+    // ---- phones (only these screens: a computer keeps the page as it is)
+    // portrait (B): the top of the screen shows half the width of the film (720 of 1440 px), moved along the film to
+    // where the action is (CROP: [seconds of the clip, left edge of the window in px of the picture], smoothed between
+    // keys); the text of the step under it, the controls at the bottom. Landscape: the title in a pill (+ = its text),
+    // smaller controls.
+    var mqB = window.matchMedia ? matchMedia('(orientation: portrait) and (max-width: 600px)') : null;
+    var mqL = window.matchMedia ? matchMedia('(pointer: coarse) and (orientation: landscape) and (max-height: 520px)') : null;
+    var pB = false, lc = false, geo = null, geoKey = '';
+    var CROP = {
+      s1_open: [[0, 360], [3.6, 360], [4.4, 0]],
+      s2_scene: [[0, 0], [12.5, 0], [14, 720]],                                        // the form, then Run and the new scene
+      s4_weather: [[0, 720], [1.5, 720], [2.5, 300], [5, 300], [6, 720], [7.5, 720], [8.5, 200], [16.5, 200], [17.5, 720],
+                   [34.5, 720], [36, 0]],                                              // the map, the list, the card of the station
+      s5_optim: [[0, 0], [31, 0], [32.5, 720], [34, 720], [35, 360]],                   // the form, Run, the terminal
+      s6_results: [[0, 360], [1.2, 0], [9, 0], [10, 375], [19, 375], [20, 360], [23, 360], [24, 0]],
+      s7_sim: [[0, 0], [16.5, 0], [17.7, 720], [19, 720], [20, 360], [26.5, 360], [27.5, 720]],
+      s8_fields: [[0, 720], [1.2, 360], [24.5, 360], [25.8, 150]]
+    };
+    var capMore = document.createElement('button');
+    capMore.type = 'button'; capMore.className = 'cap-more'; cap.appendChild(capMore);
+    capMore.onclick = function (e) { e.stopPropagation(); cap.classList.toggle('open'); };
+    var setMode = function () {
+      pB = !!(mqB && mqB.matches); lc = !pB && !!(mqL && mqL.matches);
+      screen.classList.toggle('pB', pB); screen.classList.toggle('lc', lc);
+      geo = null; geoKey = ''; capIn = null; live.dataset.box = '';
+      if (!pB) { clipsBox.style.height = ''; screen.style.removeProperty('--ph'); clipsBox.style.removeProperty('--ox'); }
+    };
+    var cropOf = function (s, u) {
+      if (s.kind === 'live') { var b = segs[s.k - 1]; return b ? cropOf(b, b.dur) : 720; }
+      var c = track1(CROP[s.id] || [[0, 360]], u); return lerp(c.a, c.b, c.f);
+    };
+    var cropShow = function (s, u) {
+      var Ws = screen.clientWidth, Hs = screen.clientHeight, ph = Math.round(Math.min(Ws * FR[1] / 720, Hs * 0.6));
+      var sc = Math.max(Ws / FR[0], ph / FR[1]), ww = Ws / sc, c = cropOf(s, u) + 360;
+      var left = Math.max(0, Math.min(FR[0] - ww, c - ww / 2));
+      var key = Ws + ',' + ph + ',' + left.toFixed(1);
+      if (key === geoKey) return;
+      geoKey = key;
+      geo = {ph: ph, s: sc, x: -left * sc, y: (ph - FR[1] * sc) / 2};
+      screen.style.setProperty('--ph', ph + 'px'); clipsBox.style.height = ph + 'px';
+      clipsBox.style.setProperty('--ox', (FR[0] - ww > 0 ? left / (FR[0] - ww) * 100 : 50).toFixed(3) + '%');
+      if (liveOn) live.dataset.box = '';
+    };
+    [mqB, mqL].forEach(function (m) { if (m && m.addEventListener) m.addEventListener('change', setMode); });
+
     // ---- each frame of the browser
     var loop = function (now) {
       requestAnimationFrame(loop);
@@ -407,10 +465,10 @@
           var v = s.v, loc = T0 - s.t0;
           want(s); want(segs[s.k + 1]);
           if (shownV !== v) showVideo(s, loc, true);
-          if (v.paused && v.readyState >= 2) {
-            if (Math.abs(v.currentTime - loc) > .05) v.currentTime = loc;
-            if (loc < s.dur - .05) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); }
-          } else if (!v.paused && !v.seeking) T0 = s.t0 + v.currentTime;
+          if (v.paused) {
+            if (v.readyState >= 1 && !v._pp && Math.abs(v.currentTime - loc) > .05) { try { v.currentTime = loc; } catch (e) { /* not yet */ } }
+            if (loc < s.dur - .05) playV(v);
+          } else if (!v.seeking) T0 = s.t0 + v.currentTime;
           if (v.ended || loc >= s.dur - .04) { v.pause(); T0 = s.t0 + s.dur + 1e-3; }
         } else T0 += dt;
         if (T0 >= total) { T0 = total; stopAuto(); }
@@ -430,10 +488,12 @@
       }
       screen.classList.add('shown');
       var seg = segAt(shown), local = shown - seg.t0;
+      if (pB) cropShow(seg, local);
       if (seg.kind === 'live') {
         liveLoad(seg);
         var before = segs[seg.k - 1];
         if (before && before.v) showVideo(before, before.dur);       // under the viewer: the end of step 2
+        want(segs[seg.k + 1]);                                         // the clip after it, ready when it ends
         if (!liveRender(seg, local) && before && before.v) { /* viewer not ready: the picture stays */ }
       } else {
         showVideo(seg, local, auto);
@@ -442,11 +502,11 @@
         if (nx && nx.kind === 'live' && local > seg.dur * .5) liveLoad(nx);   // ready by the end of the step
       }
       cards(seg, local);
-      ctl.querySelector('.fill').style.height = (shown / total * 100) + '%';
+      ctl.style.setProperty('--p', (shown / total * 100).toFixed(3) + '%');
       screen.classList.toggle('at-end', shown >= total - .05);
       screen.classList.toggle('at-start', shown < 1.2);
     };
-    window.addEventListener('resize', function () { layout(); if (liveOn) live.dataset.box = ''; });
+    window.addEventListener('resize', function () { layout(); geoKey = ''; if (liveOn) live.dataset.box = ''; });
 
     // media/film.js (a script: read also when the page is opened as a file), else media/film.json
     if (window.TOPS_FILM) build(window.TOPS_FILM);
@@ -454,7 +514,7 @@
       cap.querySelector('h2').textContent = 'media/film.json ?'; cap.classList.add('in');
     });
     window.__film = {get t() { return shown; }, get total() { return total; }, segs: segs,
-                     get free() { return free; }, get auto() { return auto; }, stop: function () { stopAuto(); }, seek: function (t) { stopAuto(); seekTo(t, false); }};
+                     get free() { return free; }, get auto() { return auto; }, get mode() { return pB ? 'pB' : lc ? 'lc' : ''; }, stop: function () { stopAuto(); }, seek: function (t) { stopAuto(); seekTo(t, false); }};
   })();
 
 

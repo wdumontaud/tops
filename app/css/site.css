@@ -105,8 +105,8 @@ main, .foot { position: relative; z-index: 1; }
 .screen.auto .ctl .play i { width: 10px; height: 11px; border: 0; margin: 0; border-left: 3px solid var(--yellow); border-right: 3px solid var(--yellow); }
 .ctl .track { position: relative; width: 16px; height: min(240px, 34vh); cursor: pointer; }
 .ctl .track::before { content: ''; position: absolute; top: 0; bottom: 0; left: 7px; width: 3px; border-radius: 2px; background: rgba(0,41,75,.25); }
-.ctl .fill { position: absolute; top: 0; left: 7px; width: 3px; border-radius: 2px; background: var(--blue); height: 0; }
-.ctl .track a { position: absolute; left: 3px; width: 11px; height: 11px; margin-top: -5px; border-radius: 50%; background: #fff;
+.ctl .fill { position: absolute; top: 0; left: 7px; width: 3px; border-radius: 2px; background: var(--blue); height: var(--p, 0); }
+.ctl .track a { position: absolute; top: var(--at); left: 3px; width: 11px; height: 11px; margin-top: -5px; border-radius: 50%; background: #fff;
   border: 2px solid rgba(0,41,75,.45); box-shadow: 0 1px 4px rgba(0,10,25,.25); transition: background .3s, border-color .3s, transform .3s; }
 .ctl .track a:hover { transform: scale(1.25); }
 .ctl .track a.on { background: var(--yellow); border-color: var(--blue); transform: scale(1.2); }
@@ -155,6 +155,49 @@ main, .foot { position: relative; z-index: 1; }
   .dl-row { flex-direction: column; }
   .os { position: static; transform: none; justify-content: center; padding: 4px 0 0; }
 }
+/* ---------- phones (js/site.js setMode: classes set only on such screens; a computer keeps the rules above) ---------- */
+/* portrait (.pB): half the width of the film on top, following the action; the text of the step under it */
+.screen.pB .clips { position: absolute; left: 0; top: 0; right: 0; height: var(--ph, 58%); overflow: hidden; }
+.screen.pB .v { object-fit: cover; object-position: var(--ox, 50%) 50%; }
+.screen.pB .cap { left: 0; right: 0; top: var(--ph, 58%); bottom: 0; width: auto; padding: 16px 18px 64px; border: 0; border-radius: 0;
+  background: var(--blue); box-shadow: none; transform: none; overflow: hidden; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.screen.pB .cap h2 { font-size: 18px; }
+.screen.pB .cap .txt { font-size: 14px; }
+.screen.pB .ctl { left: 14px; right: 14px; top: auto; bottom: 16px; transform: none; flex-direction: row; gap: 12px; }
+.screen.pB .ctl .play { flex: none; box-shadow: 0 0 0 1px rgba(255,255,255,.45); }
+.screen.pB .ctl .track { flex: 1; width: auto; height: 16px; }
+.screen.pB .ctl .track::before { top: 7px; bottom: auto; left: 0; right: 0; width: auto; height: 3px; background: rgba(255,255,255,.25); }
+.screen.pB .ctl .fill { top: 7px; left: 0; height: 3px; width: var(--p, 0); background: var(--yellow); }
+.screen.pB .ctl .track a { top: 2.5px; left: var(--at); margin: 0 0 0 -5.5px; }
+.screen.pB .scroll-hint { bottom: auto; top: calc(var(--ph, 58%) - 46px); }
+.screen.pB .tour { bottom: auto; top: calc(var(--ph, 58%) - 52px); }
+.screen.pB .live .gate, .screen.lc .live .gate { align-items: center; }
+.screen.pB .live .gate span, .screen.lc .live .gate span { margin: 0; font-size: 13px; padding: 7px 14px; }
+/* landscape (.lc): the title in a pill at the top left (+ opens its text), smaller controls */
+.cap-more { display: none; }
+.screen.lc .cap { left: 10px; top: 10px; right: auto; bottom: auto; width: auto; max-width: min(60%, 440px); padding: 6px 38px 7px 12px;
+  border-radius: 17px; background: rgba(0,41,75,.8); }
+.screen.lc .cap.in { pointer-events: auto; }
+.screen.lc .cap .num { display: inline; margin: 0 6px 0 0; font-size: 11px; }
+.screen.lc .cap h2 { display: inline; margin: 0; font-size: 13.5px; }
+.screen.lc .cap .txt { display: none; }
+.screen.lc .cap.open { padding-bottom: 11px; }
+.screen.lc .cap.open .txt { display: block; margin-top: 6px; font-size: 13px; line-height: 1.5; }
+.screen.lc .cap-more { display: grid; place-items: center; position: absolute; right: 6px; top: 5px; width: 22px; height: 22px; padding: 0;
+  border-radius: 50%; border: 1px solid rgba(255,255,255,.5); background: transparent; color: var(--yellow); font: 700 14px/1 var(--font); cursor: pointer; }
+.screen.lc .cap-more::before { content: '+'; }
+.screen.lc .cap.open .cap-more::before { content: '\2212'; }
+.screen.lc.touring .cap { opacity: 0; pointer-events: none; }
+.screen.lc .ctl { right: 4px; gap: 7px; }
+.screen.lc.shown .ctl { opacity: .8; }
+.screen.lc .ctl .play { width: 24px; height: 24px; }
+.screen.lc .ctl .play i { border-left-width: 8px; border-top-width: 5px; border-bottom-width: 5px; margin-left: 2px; }
+.screen.lc.auto .ctl .play i { width: 8px; height: 9px; border-left-width: 2.5px; border-right-width: 2.5px; margin: 0; }
+.screen.lc .ctl .track { width: 12px; height: min(150px, 40vh); }
+.screen.lc .ctl .track::before, .screen.lc .ctl .fill { left: 5px; width: 2px; }
+.screen.lc .ctl .track a { left: 2px; width: 8px; height: 8px; margin-top: -4px; border-width: 1.5px; }
+.screen.lc .scroll-hint { bottom: 10px; font-size: 12px; padding: 5px 12px; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .more b, .scroll-hint b { animation: none; }

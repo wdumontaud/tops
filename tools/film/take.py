@@ -15,12 +15,12 @@ the film by scrolling, forwards and backwards; each step starts on the last pict
               year, the estimate of Run, Run (a run of the film: NSGA2_RUNS = the sandbox, hub "hubfilm"), the hub while
               it runs; in the cut, the run of the film stopped and the run of canyon_street_1 done on the cluster opened
               from the pill (a copy in the sandbox: RUN_SHOWN, same name in the film): as if Run had launched it
-  s6_results  the Section tab (best design of each generation), the figures on the whole page (Convergence, Interface,
-              Interfaces), Load # into the form
+  s6_results  the figures on the whole page (Convergence, Interface, Interfaces), Load # into the form
   s7_sim      the Simulation mode, three days of July, outputs with fields, Run: a real co-simulation on demo_street
               (shown as canyon_street_1: ALIAS), never on canyon_street_1; the field movies read in the cut
-  s8_fields   the results on the whole page: Domus, then the field movies (temperature, horizontal and vertical flux),
-              played once over the three days
+  s8_fields   the results on the whole page: Domus (cooling drawn as the envelope of its on / off steps: COOL_JS, the
+              page of the film only), then the movies (temperature, horizontal flux, facade sun), played once over the
+              three days
 
 Before a take (the demo project must be in its first state, the terminal of the hub empty):
     1. hub for the film: launch.json "hubfilm" (8811, optimisation runs in Documents/test/site_opt/runs, with a copy
@@ -100,6 +100,18 @@ ALIAS_JS = r"""(() => { const A = %s, keys = Object.keys(A).sort((a, b) => b.len
       .observe(document.documentElement, {subtree: true, childList: true, characterData: true}); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); })();
 """ % json.dumps(ALIAS)
+# the cooling (and heating) powers of the Domus figure switch on / off at every Domus step (the control): in the film
+# (its page only, never the results) each step off takes the mean of its two neighbours, the curve the peaks draw
+COOL_JS = r"""(() => { if (window.__coolHook) return true; if (!window.Plotly || !Plotly.react) return false;
+  const env = y => y.map((v, i) => { if (v == null) return v; const a = y[i - 1], b = y[i + 1];
+    return (a == null || b == null) ? v : Math.max(v, (a + b) / 2); });
+  const react = Plotly.react, done = new WeakSet();        // a figure drawn again: its curves smoothed once
+  Plotly.react = function (div, a) {
+    const id = typeof div === 'string' ? div : div && div.id;
+    if (id === 'graphs' && a && Array.isArray(a.data))
+      a.data.forEach(t => { if (/^(cooling|heat) /.test(t.name || '') && Array.isArray(t.y) && !done.has(t.y)) { t.y = env(t.y); done.add(t.y); } });
+    return react.apply(this, arguments); };
+  window.__coolHook = true; return true; })()"""
 SIM_START, SIM_END = '2001-07-14T00:00', '2001-07-17T00:00'      # the simulation of the best design: three summer days
 STOP = "(() => { const j = JOBS.find(j => j.status === 'running'); if (j) post('/stop', {job: j.key}); return !!j; })()"
 
@@ -315,9 +327,6 @@ def step_optim(r):
 def step_results(r):
     r.x, r.y = r.w * .55, r.h * .62
     r.cursor()
-    r.click(txy(r, '#pGeom .ux-ptabs button', 'Section'), dur=.9, after=.4)   # the best design of each generation
-    r.glide(r.w * .45, r.h * .5, .8)
-    r.pause(6.5)
     r.click('#pGraphs .ux-fullbtn', dur=1.0, after=2.6)                       # the figures on the whole page
     r.glide(r.w * .5, r.h * .55, .9)
     r.pause(3.0)                                                              # Convergence
@@ -381,11 +390,10 @@ def step_sim(r):
 
 # the field movie of a tab of the Graphs panel drawn (its colour bar: T, qx, qy) and its player shown
 FIELD_READY = """(() => { const g = document.getElementById('graphsModel'), b = document.getElementById('modelBar');
-  const c = g && g.data && g.data[0] && g.data[0].colorbar && g.data[0].colorbar.title;
-  return !!c && %s.test(c.text || '') && !!b && !b.hidden && !!b.offsetWidth; })()"""
-
-
-FIELD_TABS = [('Temperature field', '/^T/'), ('Horizontal flux', '/^q<sub>x/'), ('Vertical flux', '/^q<sub>y/')]
+  return !!g && !!g.data && !!g.layout && !!b && !b.hidden && !!b.offsetWidth && (%s)(g); })()"""
+_CB = "g => %s.test(((g.data[0] || {}).colorbar || {}).title ? g.data[0].colorbar.title.text || '' : '')"
+FIELD_TABS = [('Temperature field', _CB % '/^T/'), ('Horizontal flux', _CB % '/^q<sub>x/'),
+              ('Facade sun', "g => JSON.stringify(g.layout.annotations || []).includes('sunlit part')")]
 DOMUS_READY = "(() => { const b = [...document.querySelectorAll('#pGraphs button.dom')].find(e => e.offsetWidth); return !!b && b.classList.contains('on'); })()"
 
 
@@ -427,16 +435,14 @@ def step_fields(r):
     r.pause(6.6)                                                              # the sun on the outer face, the nights
     field_tab(r, 'Horizontal flux', .3)                                       # the heat flux across the wall
     r.glide(*rest, .9)
-    r.pause(3.6)
-    field_tab(r, 'Vertical flux', .3)                                         # along it: the blocks of the design
-    r.glide(*rest, .9)
-    r.pause(3.0)
-    field_tab(r, 'Temperature field', .3)
+    r.pause(4.0)
+    field_tab(r, 'Facade sun', .3)                                            # the sun on the facade, the same instants
     r.glide(*rest, .9)
     r.hide_cursor()
-    left = loop - .6 - (time.time() - t0)
-    print('  movie: %.1f s, %.1f s left' % (loop, left))
-    r.pause(max(.5, min(2.5, left)))
+    # the end on the last instants of the movie (never back to its start)
+    left = r.js("(movieCount - 1 - movieIdx) / (movieFps * (+document.getElementById('modelSpeed').value || 1))")
+    print('  movie: %.1f s, %.1f s left after %.1f s' % (loop, left, time.time() - t0))
+    r.pause(max(.5, min(6.0, left - .4)))
 
 
 def main():
@@ -450,6 +456,9 @@ def main():
         r.pause(.6)
         r.start()
         step_open(r, hub)
+        r.wait("typeof Plotly === 'object' && !!Plotly.react", 60)          # loaded with the project, not on the home
+        if not r.js(COOL_JS):
+            raise RuntimeError('no Plotly in the page: the cooling of the film not smoothed')
         vals = r.js('JSON.stringify(collectParams())')
         vals = json.loads(vals)
         bad = {k: vals.get(k) for k in ('rows_1', 'DX', 'floors_1') if str(vals.get(k)) != str(START[k])}

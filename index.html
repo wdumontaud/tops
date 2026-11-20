@@ -3,49 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>TOPS</title>
-<meta name="description" content="TOPS : optimisation énergétique de la topologie et de la forme d'une paroi de bâtiment.">
+<title>TOPS — l’application</title>
+<meta name="description" content="TOPS : optimisation énergétique de la topologie et de la forme d'une paroi de bâtiment. Visite de l'application.">
 <link rel="icon" href="assets/tops.png">
-<link rel="stylesheet" href="css/site.css?v=2026-11-20a">
+<link rel="stylesheet" href="css/site.css?v=2026-11-20c">
 </head>
 <body>
 
+<!-- the background of the home page (../webpage): white iso-lines on the CNRS blue (js/field.js, same field) -->
+<canvas id="field" data-line="255,255,255" data-alpha="0.5"></canvas>
+
 <header class="top">
-  <a class="brand" href="#"><img src="assets/tops.png" alt="" width="22" height="22"><span>TOPS</span></a>
+  <a class="back" href="../webpage/index.html">← <span data-i18n="home">Accueil</span></a>
   <div class="lang" role="group" aria-label="Langue / Language">
     <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
   </div>
 </header>
 
 <main>
-  <!-- ============ landing: what it is + download ============ -->
+  <!-- ============ landing: what the application is, then the film ============ -->
   <section class="hero">
-    <div class="hero-text">
-      <h1>TOPS</h1>
-      <p class="sub" data-i18n="tagline">Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment</p>
-      <p class="lead" data-i18n="lead">Une application qui couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis cherche la forme de paroi qui consomme le moins.</p>
-
-      <div class="dl card">
-        <div class="dl-head">
-          <div><b data-i18n="dlTitle">Télécharger TOPS</b><span class="ver">2026.11</span></div>
-          <div class="os"><span class="chip">Windows</span><span class="chip">Linux</span></div>
-        </div>
-        <form class="dl-form" id="dlForm" autocomplete="off">
-          <label for="dlCode" data-i18n="dlLabel">Code d’accès</label>
-          <div class="dl-row">
-            <input id="dlCode" name="code" type="text" inputmode="text" spellcheck="false" data-i18n-ph="dlPh" placeholder="Votre code">
-            <button class="btn accent" type="submit" data-i18n="dlBtn">Télécharger</button>
-          </div>
-          <p class="dl-note" id="dlNote" data-i18n="dlNote">Le code vous est donné personnellement. Vous serez prévenu des nouvelles versions.</p>
-        </form>
-      </div>
-    </div>
-    <figure class="hero-shot win">
-      <div class="win-bar"><i></i><i></i><i></i></div>
-      <img src="media/s1_open.jpg" alt="" data-i18n-alt="heroAlt">
-    </figure>
-    <div class="more"><a href="#film"><span data-i18n="more">Découvrir l’application</span> <b>↓</b></a>
-      <button class="watch" type="button">▶ <span data-i18n="watch">Regarder comme une vidéo</span></button></div>
+    <p class="kicker"><img src="assets/tops.png" alt="" width="26" height="26"><span>TOPS</span></p>
+    <h1 data-i18n="tagline">Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment</h1>
+    <p class="lead" data-i18n="lead">TOPS couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis optimise la forme et la topologie de cette paroi. Le film qui suit parcourt l’application sur un cas réel : une rue de La Rochelle, de la scène urbaine aux champs de température dans la paroi optimale.</p>
+    <div class="more"><a href="#film"><span data-i18n="more">Parcourir l’application</span> <b>↓</b></a>
+      <button class="watch" type="button">▶ <span data-i18n="watch">Lecture continue</span></button></div>
   </section>
 
   <!-- ============ the film: one screen held in place; the scrolling is its time (forwards, backwards, still) ============ -->
@@ -78,16 +60,27 @@
     </div>
   </section>
 
+  <!-- ============ download by code (the service behind is not open yet) ============ -->
   <section class="end">
-    <h2 data-i18n="endT">Essayer TOPS</h2>
-    <p data-i18n="endP">La version 2026.11 (Windows, Linux) se télécharge avec un code d’accès, en haut de cette page.</p>
-    <a class="btn accent" href="#dlForm">↑ <span data-i18n="endBtn">Télécharger TOPS</span></a>
+    <h2 data-i18n="dlTitle">Télécharger TOPS</h2>
+    <p data-i18n="endP">Version 2026.11, pour Windows et Linux, avec le code d’accès qui vous a été transmis.</p>
+    <form class="dl-form" id="dlForm" autocomplete="off">
+      <label class="sr" for="dlCode" data-i18n="dlLabel">Code d’accès</label>
+      <div class="dl-row">
+        <input id="dlCode" name="code" type="text" inputmode="text" spellcheck="false" data-i18n-ph="dlPh" placeholder="Code d’accès">
+        <button class="btn" type="submit" data-i18n="dlBtn">Télécharger</button>
+      </div>
+      <p class="dl-note" id="dlNote" data-i18n="dlNote">Le code est personnel ; ses détenteurs sont prévenus des nouvelles versions.</p>
+    </form>
   </section>
 </main>
 
-<footer class="foot"><span>TOPS · La Rochelle Université</span></footer>
+<footer class="foot">
+  <p class="credit" data-i18n="credit">William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille Université</p>
+</footer>
 
-<script src="media/film.js?v=2026-11-20a"></script>
-<script src="js/site.js?v=2026-11-20b"></script>
+<script src="media/film.js?v=2026-11-20c"></script>
+<script src="js/field.js?v=2026-11-20c"></script>
+<script src="js/site.js?v=2026-11-20c"></script>
 </body>
 </html>

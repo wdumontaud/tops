@@ -7,13 +7,13 @@
   var T = {
     fr: {
       tagline: 'Optimisation énergétique de la topologie et de la forme d’une paroi de bâtiment',
-      lead: 'Une application qui couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis cherche la forme de paroi qui consomme le moins.',
-      dlTitle: 'Télécharger TOPS', dlLabel: 'Code d’accès', dlPh: 'Votre code', dlBtn: 'Télécharger',
-      dlNote: 'Le code vous est donné personnellement. Vous serez prévenu des nouvelles versions.',
+      lead: 'TOPS couple la simulation thermique d’un bâtiment (Domus) à un modèle fin de sa paroi, puis optimise la forme et la topologie de cette paroi. Le film qui suit parcourt l’application sur un cas réel : une rue de La Rochelle, de la scène urbaine aux champs de température dans la paroi optimale.',
+      home: 'Accueil', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille Université',
+      dlTitle: 'Télécharger TOPS', dlLabel: 'Code d’accès', dlPh: 'Code d’accès', dlBtn: 'Télécharger',
+      dlNote: 'Le code est personnel ; ses détenteurs sont prévenus des nouvelles versions.',
       dlEmpty: 'Entrez le code que vous avez reçu.',
       dlSoon: 'Le téléchargement par code sera ouvert prochainement.',
-      heroAlt: 'La fenêtre de TOPS : paramètres de la co-simulation, coupe de la paroi et vue 3D',
-      more: 'Découvrir l’application', watch: 'Regarder comme une vidéo', play: 'Lecture', pause: 'Pause',
+      more: 'Parcourir l’application', watch: 'Lecture continue', play: 'Lecture', pause: 'Pause',
       scrollHint: 'Faites défiler pour avancer',
       s1t: 'Ouvrir TOPS',
       s1p: 'TOPS s’ouvre comme une application de bureau. On choisit la co-simulation Domus : le bâtiment et sa paroi calculés ensemble, ici dans une rue de La Rochelle.',
@@ -28,23 +28,22 @@
       s5t: 'Optimiser la forme de la paroi',
       s5p: 'En mode Optimisation, la paroi devient un dessin libre de deux matériaux (level-set). Un algorithme génétique cherche celui qui réduit le flux de chaleur à travers la face intérieure sur un an ; chaque essai est une co-simulation Domus. Run donne d’abord une estimation du temps ; le run complet (200 individus, 20 générations, 4 200 co-simulations) a tourné sur le cluster.',
       s6t: 'Les résultats de l’optimisation',
-      s6p: 'Le meilleur dessin de chaque génération défile dans la coupe de la paroi. La convergence : de 700 kWh pour le mur plan à 180 kWh, soit −74 %. Puis le dessin optimal face à la référence, et les meilleurs au fil des générations. Un clic le charge dans le formulaire.',
+      s6p: 'La convergence : de 700 kWh pour le mur plan à 180 kWh, soit −74 %. Puis le dessin optimal face à la référence, et les meilleurs au fil des générations. Un clic le charge dans le formulaire.',
       s7t: 'Simuler le cas optimal',
       s7p: 'Le dessin optimal, en mode Simulation : trois jours de juillet, avec les champs de température et de flux dans la paroi. Domus (le bâtiment et la rue) et le modèle de paroi tournent ensemble, pas à pas.',
       s8t: 'Les champs dans la paroi',
-      s8p: 'Les résultats en plein écran : Domus (zones, puissances, flux de la façade), puis la température dans la paroi pendant les trois jours, bande par bande, fenêtres comprises. Le soleil chauffe la face extérieure le jour ; le flux horizontal traverse la paroi, le flux vertical suit les blocs du dessin optimal.',
-      endT: 'Essayer TOPS', endP: 'La version 2026.11 (Windows, Linux) se télécharge avec un code d’accès, en haut de cette page.',
-      endBtn: 'Télécharger TOPS', steps: 'Étapes'
+      s8p: 'Les résultats en plein écran : Domus (zones, puissance de refroidissement, flux de la façade), puis la température dans la paroi pendant les trois jours, bande par bande, fenêtres comprises. Le soleil chauffe la face extérieure le jour, le flux horizontal traverse la paroi ; enfin la part ensoleillée de la façade, aux mêmes instants.',
+      endP: 'Version 2026.11, pour Windows et Linux, avec le code d’accès qui vous a été transmis.', steps: 'Étapes'
     },
     en: {
       tagline: 'Energy optimisation of the topology and the shape of a building wall',
-      lead: 'An application that couples the thermal simulation of a building (Domus) with a fine model of its wall, then looks for the wall shape that uses the least energy.',
-      dlTitle: 'Download TOPS', dlLabel: 'Access code', dlPh: 'Your code', dlBtn: 'Download',
-      dlNote: 'The code is given to you personally. You will be told of new versions.',
+      lead: 'TOPS couples the thermal simulation of a building (Domus) with a fine model of its wall, then optimises the shape and the topology of that wall. The film below goes through the application on a real case: a street of La Rochelle, from the urban scene to the temperature fields in the optimal wall.',
+      home: 'Home', credit: 'William Dumontaud — LaSIE, La Rochelle Université · IUSTI, Aix-Marseille University',
+      dlTitle: 'Download TOPS', dlLabel: 'Access code', dlPh: 'Access code', dlBtn: 'Download',
+      dlNote: 'The code is personal; its holders are told of new versions.',
       dlEmpty: 'Enter the code you received.',
       dlSoon: 'Download by code opens soon.',
-      heroAlt: 'The TOPS window: co-simulation settings, wall section and 3D view',
-      more: 'Discover the application', watch: 'Watch as a video', play: 'Play', pause: 'Pause',
+      more: 'Go through the application', watch: 'Play through', play: 'Play', pause: 'Pause',
       scrollHint: 'Scroll to move on',
       s1t: 'Opening TOPS',
       s1p: 'TOPS opens as a desktop application. We pick the Domus co-simulation: the building and its wall computed together, here in a street of La Rochelle.',
@@ -59,13 +58,12 @@
       s5t: 'Optimising the shape of the wall',
       s5p: 'In Optimisation mode the wall becomes a free drawing of two materials (level-set). A genetic algorithm looks for the one that lowers the heat flux through the internal face over a year; each try is a Domus co-simulation. Run first gives an estimate of the time; the full run (200 individuals, 20 generations, 4,200 co-simulations) was done on the cluster.',
       s6t: 'The results of the optimisation',
-      s6p: 'The best drawing of each generation plays in the section of the wall. The convergence: from 700 kWh for the plane wall to 180 kWh, −74 %. Then the optimal drawing against the reference, and the best ones generation after generation. One click loads it into the form.',
+      s6p: 'The convergence: from 700 kWh for the plane wall to 180 kWh, −74 %. Then the optimal drawing against the reference, and the best ones generation after generation. One click loads it into the form.',
       s7t: 'Simulating the optimal case',
       s7p: 'The optimal drawing in Simulation mode: three days of July, with the fields of temperature and heat flux in the wall. Domus (the building and the street) and the wall model run together, step by step.',
       s8t: 'The fields in the wall',
-      s8p: 'The results on the whole screen: Domus (zones, power, fluxes of the facade), then the temperature in the wall over the three days, band by band, windows included. The sun heats the outer face by day; the horizontal flux crosses the wall, the vertical flux follows the blocks of the optimal drawing.',
-      endT: 'Try TOPS', endP: 'Version 2026.11 (Windows, Linux) is downloaded with an access code, at the top of this page.',
-      endBtn: 'Download TOPS', steps: 'Steps'
+      s8p: 'The results on the whole screen: Domus (zones, cooling power, fluxes of the facade), then the temperature in the wall over the three days, band by band, windows included. The sun heats the outer face by day, the horizontal flux crosses the wall; last, the sunlit part of the facade at the same instants.',
+      endP: 'Version 2026.11, for Windows and Linux, with the access code you were given.', steps: 'Steps'
     }
   };
   var store = {
@@ -93,10 +91,21 @@
   var top = document.querySelector('.top'), lastY = window.scrollY;
   var onScroll = function () {
     var y = window.scrollY, hero = document.querySelector('.hero').offsetHeight;
-    top.classList.toggle('scrolled', y > 8);
     if (Math.abs(y - lastY) > 4) { top.classList.toggle('away', y > lastY && y > hero * .6); lastY = y; }
   };
   window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  // ---------- the background of the home page (js/field.js): drawn only where the film does not cover the screen ----------
+  (function () {
+    var cv = document.getElementById('field'), fld = cv && typeof FIELD === 'function' ? FIELD(cv) : null;
+    if (!fld) return;                                              // no WebGL2: the plain blue stays
+    var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var film = document.getElementById('film');
+    var covered = function () { var r = film.getBoundingClientRect(); return r.top <= 0 && r.bottom >= window.innerHeight; };
+    if (still) { fld.draw(20); window.addEventListener('resize', function () { fld.draw(20); }); return; }
+    var tick = function (ms) { requestAnimationFrame(tick); if (!covered()) fld.draw(ms / 1000 + 20); };
+    requestAnimationFrame(tick);
+  })();
 
   // ---------- the film ----------
   // One screen held in place (sticky) while the page scrolls under it: the scrolling is the time of the film (PX

@@ -4,13 +4,13 @@
   900
  ],
  "clips": {
-  "s1_open": 12.433,
-  "s2_scene": 21.167,
-  "s4_weather": 36.833,
-  "s5_optim": 41.8,
-  "s6_results": 38.633,
-  "s7_sim": 30.9,
-  "s8_fields": 35.267
+  "s1_open": 11.667,
+  "s2_scene": 21.367,
+  "s4_weather": 36.333,
+  "s5_optim": 41.933,
+  "s6_results": 26.5,
+  "s7_sim": 31.033,
+  "s8_fields": 30.7
  },
  "live": {
   "pose": {

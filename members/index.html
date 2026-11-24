@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Membres — TOPS</title>
+<meta name="description" content="L’équipe de la thèse TOPS : William Dumontaud, Julien Berger (LaSIE), Benjamin Kadoch (IUSTI).">
+<link rel="icon" href="../assets/tops.png">
+<link rel="stylesheet" href="../css/bar.css">
+<link rel="stylesheet" href="members.css">
+</head>
+<body>
+
+<!-- même fond animé que l'accueil et les articles (../js/field.js) -->
+<canvas id="field" data-line="255,255,255" data-alpha="0.32"></canvas>
+
+<!-- bandeau commun à toutes les pages (../css/bar.css) -->
+<header class="bar">
+  <div class="side"><a class="home" href="../index.html"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h4.5v-6h3v6H18V9.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="back">Accueil</span></a></div>
+  <h1 data-i18n="title">Membres</h1>
+  <div class="side right">
+    <div class="lang" role="group" aria-label="Langue / Language" title="Langue / Language">
+      <button type="button" data-lang="fr">FR</button><button type="button" data-lang="en">EN</button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <p class="intro" data-i18n-html="intro"></p>
+  <ul class="grid" id="grid"></ul>
+</main>
+
+<script src="../js/field.js"></script>
+<script src="data.js"></script>
+<script src="members.js"></script>
+</body>
+</html>
